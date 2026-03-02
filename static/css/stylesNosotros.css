@@ -1,0 +1,146 @@
+@import url('https://fonts.googleapis.com/css2?family=Quicksand:wght@400;600&display=swap');
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: 'Quicksand', sans-serif;
+    background-color: #f2f4f8;
+    color: #333;
+    line-height: 1.6;
+}
+
+.container {
+    max-width: 900px;
+    margin: auto;
+    padding: 20px;
+}
+
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: #ffffff;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    margin-bottom: 30px;
+}
+
+.header h1 {
+    font-size: 32px;
+    font-weight: 600;
+}
+
+.header .red {
+    color: #000000;
+}
+
+.header .pulse {
+    color: #B93A32;
+}
+
+.header nav ul {
+    list-style: none;
+    display: flex;
+    gap: 20px;
+}
+
+.header nav a {
+    text-decoration: none;
+    color: #333;
+    font-weight: bold;
+    transition: color 0.3s;
+}
+
+.header nav a:hover {
+    color: #B93A32;
+}
+
+.main-content {
+    background-color: #ffffff;
+    padding: 30px;
+    border-radius: 10px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    margin-bottom: 30px;
+}
+
+.about-section h2 {
+    font-size: 28px;
+    color: #B93A32;
+    margin-bottom: 15px;
+}
+
+.about-section p {
+    font-size: 18px;
+    margin-bottom: 20px;
+}
+
+.highlight {
+    color: #B93A32;
+    font-weight: bold;
+}
+
+.mission-vision-values {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 25px;
+}
+
+.mission, .vision, .values {
+    background-color: #f8f9fb;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+}
+
+.mission h3, .vision h3, .values h3 {
+    color: #B93A32;
+    font-size: 24px;
+    margin-bottom: 10px;
+}
+
+.values ul {
+    list-style: none;
+    padding-left: 15px;
+}
+
+.values li {
+    font-size: 16px;
+    margin-bottom: 8px;
+}
+
+.values li strong {
+    color: #333;
+}
+
+.footer {
+    text-align: center;
+    font-size: 14px;
+    color: #666;
+    padding: 15px 0;
+    border-top: 1px solid #e0e0e0;
+}
+
+.no-underline {
+    text-decoration: none;
+}
+
+.go-back {
+    position: absolute;
+    top: 20px;
+    left: 20px;
+    font-size: 16px;
+    color: #333;
+    text-decoration: none;
+    font-weight: bold;
+    transition: color 0.3s;
+}
+
+.go-back:hover {
+    color: #B93A32;
+}
+

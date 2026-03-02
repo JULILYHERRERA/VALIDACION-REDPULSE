@@ -1,0 +1,122 @@
+@import url('https://fonts.googleapis.com/css2?family=Quicksand:wght@400;600&display=swap');
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: 'Quicksand', sans-serif;
+    background-color: #f2f4f8; /* Color de fondo más suave */
+    color: #333;
+}
+
+.container {
+    max-width: 800px;
+    margin: auto;
+    padding: 20px;
+}
+
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: #ffffff;
+    padding: 15px;
+    border-radius: 10px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    margin-bottom: 20px;
+}
+
+.header h1 {
+    font-size: 32px;
+    font-weight: 600;
+}
+
+.header .red {
+    color: #000000; /* Color negro para "Red" */
+}
+
+.header .pulse {
+    color: #B93A32; /* Rojo vibrante para "Pulse" */
+}
+
+.header nav ul {
+    list-style: none;
+    display: flex;
+    gap: 15px;
+}
+
+.header nav a {
+    text-decoration: none;
+    color: #333;
+    font-weight: bold;
+    transition: color 0.3s;
+}
+
+.header nav a:hover {
+    color: #B93A32; /* Color al pasar el ratón */
+}
+
+.main-content {
+    background-color: #ffffff;
+    padding: 30px; /* Aumentado para mejor espaciado */
+    border-radius: 10px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+.historical {
+    border-bottom: 1px solid #ddd;
+    padding: 15px 0;
+}
+
+.historical:last-child {
+    border-bottom: none;
+}
+
+.historical h3 {
+    font-size: 20px;
+    color: #B93A32; /* Rojo vibrante */
+}
+
+.historical p {
+    font-size: 16px;
+    color: #666;
+}
+
+.back-button {
+  margin-top: 20px  ;
+  font-family: 'Quicksand', sans-serif;
+  background-color: #B93A32;
+  color: #fff;
+  border: none;
+  padding: 6px 12px;
+  border-radius: 500px;
+  cursor: pointer;
+  font-weight: bold;
+  transition: background-color 0.3s;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+.back-button:hover {
+    background-color: #A12824; /* Color más oscuro al pasar el ratón */
+}
+
+.no-underline {
+  text-decoration: none;
+}
+
+.go-back {
+    position: absolute;
+    top: 20px;
+    left: 20px;
+    font-size: 16px;
+    color: #333;
+    text-decoration: none;
+    font-weight: bold;
+    transition: color 0.3s;
+}
+
+.go-back:hover {
+    color: #B93A32;
+}

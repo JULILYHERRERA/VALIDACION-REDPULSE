@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RedPulse - Solicitudes de Donación </title>
+    <link rel="stylesheet" href="/css/stylesSolicitudesPendientes.css">
+    
+</head>
+<body>
+    <div class="container">
+        <header class="header">
+            <a class="no-underline">
+                <h1><span class="red">Red</span><span class="pulse">Pulse</span></h1>
+            </a>
+            <nav>
+                <ul>
+                    <li><a href="{{ url_for('estadisticas') }}">Estadisticas</a></li>
+                    <li><a href="{{ url_for('logout') }}">Cerrar sesión</a></li>
+                </ul>
+            </nav>
+        </header>
+
+        <main class="main-content">
+
+            <section class="donations-list">
+                <h2>Solicitudes de Donación Pendientes</h2>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Donante</th>
+                            <th>Tipo de Sangre</th>
+                            <th>Cantidad (ml)</th>
+                            <th>Fecha</th>
+                            <th>Razon</th>
+                            <th>Prioridad</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    </tbody>
+                </table>
+                
+            </section>
+            
+        </main>
+
+    </div>
+
+    <!-- Modal de mensaje -->
+    <div id="message-popup">
+        <div class="popup-content">
+            <h2>Razón de la Solicitud</h2>
+            <p id="razon-text"></p>
+            <button onclick="closePopup()">Cerrar</button>
+        </div>
+    </div>
+
+<script>
+
+// Convertir los datos de solicitudes que vienen desde Flask
+const solicitudes = JSON.parse('{{ solicitudes_pendientes | safe }}');
+
+// Llamada para crear filas de solicitudes
+document.addEventListener("DOMContentLoaded", function() {
+    crearFilasSolicitudes(solicitudes);
+});
+
+function crearFilasSolicitudes(solicitudes) {
+    const tbody = document.querySelector(".donations-list table tbody");
+    tbody.innerHTML = ""; // Limpiar filas anteriores si existían
+
+    solicitudes.forEach(solicitud => {
+        const fila = document.createElement("tr");
+
+        fila.innerHTML = `
+            <td>${solicitud.nombreDonante}</td>
+            <td>${solicitud.tipoSangre}</td>
+            <td>${solicitud.cantidad}</td>
+            <td>${solicitud.fecha}</td>
+            <td><button class="reason-button" onclick="mostrarRazon('${solicitud.razon}')">Razón</button></td>
+            <td>${solicitud.prioridad}</td>
+            <td>
+                <button class="approve-button" onclick="procesarSolicitud(${solicitud.id}, 'Aprobado', '${solicitud.tipoSangre}', this)">Aprobar</button>
+                <button class="reject-button" onclick="procesarSolicitud(${solicitud.id}, 'Denegado', '${solicitud.tipoSangre}', this)">Rechazar</button>
+            </td>
+        `;
+
+        tbody.appendChild(fila);
+    });
+}
+
+// Funcion para actualizar el estado del registro
+function procesarSolicitud(id, accion, tipo_sangre, boton) {
+    // Crear un objeto con los datos a enviar
+    const data = { id: id, accion: accion, tipo_sangre: tipo_sangre };
+
+    // Enviar solicitud POST a Flask
+    fetch('/solicitudes_pendientes', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(data)
+    }).then(() => {
+        // Eliminar la fila de la tabla después de enviar la solicitud
+        const fila = boton.closest("tr");
+        fila.remove();
+    }).catch(error => console.error("Error al procesar la solicitud:", error));
+}
+
+// Funcion para mostrar el popup con la razón
+function mostrarRazon(razon) {
+    document.getElementById("razon-text").textContent = razon;
+    document.getElementById('message-popup').classList.add('active');
+}
+
+function closePopup() {
+    document.getElementById('message-popup').classList.remove('active');
+}
+
+</script>
+
+</body>
+</html>

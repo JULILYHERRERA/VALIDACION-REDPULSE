@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RedPulse - Recuperar Contrasena</title>
+    <link rel="stylesheet" href="/css/stylesSolicitarRecuperacion.css">
+
+</head>
+<body>
+
+    <!-- Modal Container -->
+    <div class="modal">
+        <!-- Modal Left (Form Section) -->
+        <div class="modal-left">
+            <a href="{{ url_for('login') }}" class="close-btn">&times;</a>
+            <header class="header">
+              <h1><span class="red">Red</span><span class="pulse">Pulse</span></h1>
+            </header>
+
+            <h2>¡Recupera tu contraseña!</h2>
+            <form id="getEmailForm" method="POST">
+                <input type="email" name="correo" placeholder="Ingrese el Correo Electrónico de su cuenta" required>
+                
+                <button type="submit">Continuar</button>
+            </form>
+
+        </div>
+
+        <!-- Modal Right (Image Section) -->
+        <div class="modal-right"></div>
+    </div>
+
+    <!-- Modal de éxito -->
+    <div id="success-message" {% if session.correo_valido_resultado == True %}class="active"{% endif %}>
+        <div class="success-content">
+            <h2>¡Correo valido, continue con el proceso!</h2>
+            <button onclick="submitForm()">Continuar</button>
+        </div>
+    </div>
+
+    <!-- Modal de error -->
+    <div id="error-message" {% if session.correo_valido_resultado == False %}class="active"{% endif %}>
+        <div class="error-content">
+            <h2>¡El correo no existe o es incorrecto!</h2>
+            <button onclick="closeErrorMessage()">Cerrar</button>
+        </div>
+    </div>
+
+    <script>
+        function closeErrorMessage() {
+            document.getElementById('error-message').style.display = 'none';
+        }
+
+        function submitForm() {
+            window.location.href = 'reestablecer_contrasena';
+        }
+    </script> 
+
+</body>
+</html>

@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nosotros - RedPulse</title>
+    <link rel="stylesheet" href="/css/stylesNosotros.css">
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <header class="header">
+            <a href="{{ url_for('home') }}" class="no-underline">
+                <h1><span class="red">Red</span><span class="pulse">Pulse</span></h1>
+            </a>
+            <nav>
+                <ul>
+                    <li><a href="{{ url_for('home') }}">Inicio</a></li>
+                    <li><a href="{{ url_for('informacion_preparativos') }}">Preparativos Donación</a></li>
+                    <li><a href="{{ url_for('chatbot') }}">Preguntas Frecuentes</a></li>
+                </ul>
+            </nav>
+        </header>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <a href="javascript:void(0);" onclick="history.back()" class="go-back">
+                &#8592; Regresar
+            </a>
+            
+
+
+            <section class="about-section">
+                <h2>¿Quiénes Somos?</h2>
+                <p>En <span class="highlight">RedPulse</span>, somos una organización dedicada a conectar donantes de sangre con personas necesitadas. Creemos que el poder de salvar vidas está en la colaboración de la comunidad y la tecnología.</p>
+            </section>
+
+            <section class="mission-vision-values">
+                <div class="mission">
+                    <h3>Nuestra Misión</h3>
+                    <p>Facilitar la donación de sangre de manera segura, rápida y eficiente a través de una plataforma confiable y accesible para todos. Queremos contribuir a una sociedad más solidaria, donde la ayuda esté al alcance de todos.</p>
+                </div>
+                
+                <div class="vision">
+                    <h3>Nuestra Visión</h3>
+                    <p>Convertirnos en la plataforma líder en la coordinación de donaciones de sangre en la región, promoviendo la donación responsable y ayudando a salvar millones de vidas.</p>
+                </div>
+                
+                <div class="values">
+                    <h3>Nuestros Valores</h3>
+                    <ul>
+                        <li><strong>Compromiso:</strong> Nos dedicamos a hacer una diferencia positiva en la vida de las personas.</li>
+                        <li><strong>Transparencia:</strong> Mantenemos prácticas honestas y confiables en todas nuestras interacciones.</li>
+                        <li><strong>Innovación:</strong> Usamos la tecnología para mejorar la experiencia de los donantes y las instituciones médicas.</li>
+                        <li><strong>Empatía:</strong> Valoramos a cada individuo y entendemos la importancia de cada donación.</li>
+                    </ul>
+                </div>
+            </section>
+        </main>
+
+        <!-- Footer -->
+        <footer class="footer">
+            <p>&copy; 2024 RedPulse. Todos los derechos reservados.</p>
+        </footer>
+    </div>
+</body>
+</html>

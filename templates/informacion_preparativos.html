@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Preparativos para Donar Sangre</title>
+    <link rel="stylesheet" href="/css/stylesinformacionPreparativos.css">
+</head>
+<body>
+
+    <a href="javascript:void(0);" onclick="history.back()" class="go-back">
+        &#8592; Regresar
+    </a>
+    
+    <div class="container">
+        <!-- Header -->
+        <header class="header">
+            <h1><span class="red">Red</span><span class="pulse">Pulse</span></h1>
+            <nav>
+                <ul>
+                    <li><a href="{{ url_for('home') }}">Inicio</a></li>
+                    <li><a href="{{ url_for('nosotros') }}">Nosotros</a></li>
+                    <li><a href="{{ url_for('chatbot') }}">Preguntas Frecuentes</a></li>
+                </ul>
+            </nav>
+        </header>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- About Section -->
+            <section id="about" class="about-section">
+                <h2>Acerca de la Donación de Sangre</h2>
+                <p>Donar sangre es un acto solidario que puede salvar vidas. Sin embargo, existen ciertas recomendaciones y cuidados previos que debes considerar para asegurar una experiencia segura y beneficiosa tanto para el donante como para el receptor.</p>
+            </section>
+
+            <!-- Preparativos Section -->
+            <section id="preparativos" class="mission-vision-values">
+                <div class="mission">
+                    <h3>Preparativos Previos a la Donación</h3>
+                    <ul>
+                        <li>Descansa bien la noche anterior, procura dormir al menos 8 horas.</li>
+                        <li>Desayuna o almuerza bien antes de donar. Evita alimentos grasos.</li>
+                        <li>Hidrátate correctamente: bebe abundante agua unas horas antes de tu donación.</li>
+                        <li>Evita el consumo de alcohol 24 horas antes de la donación.</li>
+                        <li>No fumes al menos 2 horas antes y después de donar sangre.</li>
+                    </ul>
+                </div>
+
+                <!-- Precauciones Section -->
+                <div class="vision" id="precauciones">
+                    <h3>Precauciones a Tener en Cuenta</h3>
+                    <ul>
+                        <li>Asegúrate de no estar enfermo o haber tenido una fiebre reciente.</li>
+                        <li>Espera al menos 6 meses después de realizarte un tatuaje o piercing antes de donar.</li>
+                        <li>Si has viajado recientemente a áreas con riesgo de malaria, informa al personal médico.</li>
+                        <li>Consulta con el personal si tomas algún medicamento o si tienes alguna condición médica especial.</li>
+                    </ul>
+                </div>
+
+                <!-- Recomendaciones Post-Donación -->
+                <div class="values">
+                    <h3>Cuidados Después de Donar</h3>
+                    <ul>
+                        <li><strong>Descanso:</strong> Descansa unos minutos en el sitio de donación para evitar mareos.</li>
+                        <li><strong>Hidratación:</strong> Bebe abundante agua después de donar.</li>
+                        <li><strong>Evita esfuerzo físico:</strong> Evita actividades físicas intensas durante el resto del día.</li>
+                    </ul>
+                </div>
+            </section>
+        </main>
+
+        <!-- Footer -->
+        <footer class="footer">
+            <p>Recuerda, tu donación puede salvar vidas. ¡Gracias por tu generosidad!</p>
+        </footer>
+    </div>
+</body>
+</html>

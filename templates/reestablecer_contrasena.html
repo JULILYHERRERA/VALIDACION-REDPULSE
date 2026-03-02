@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RedPulse - Recuperar Contrasena</title>
+    <link rel="stylesheet" href="/css/stylesReestablecerContrasena.css">
+
+</head>
+<body>
+
+    <!-- Modal Container -->
+    <div class="modal">
+        <!-- Modal Left (Form Section) -->
+        <div class="modal-left">
+            <a href="{{ url_for('home') }}" class="close-btn">&times;</a>
+            <header class="header">
+              <h1><span class="red">Red</span><span class="pulse">Pulse</span></h1>
+            </header>
+
+            <h2>¡Recupera tu contraseña!</h2>
+            <form id="restorePasswordForm" method="POST">
+                <input type="text" name="codigo_recuperacion" placeholder="Ingrese el codigo enviado a su correo" required>
+                <input type="password" name="nueva_contrasena" placeholder="Escribe tu nueva contraseña" required>
+                <input type="password" name="confirmacion_nueva_contrasena" placeholder="Confirma contraseña" required>
+                
+                <button type="submit">Confirmar</button>
+            </form>
+
+        </div>
+
+        <!-- Modal Right (Image Section) -->
+        <div class="modal-right"></div>
+    </div>
+
+    <!-- Modal de éxito -->
+    <div id="success-message" {% if session.cambio_contrasena_exitoso == True %}class="active"{% endif %}>
+        <div class="success-content">
+            <h2>¡Contraseña restaurada!</h2>
+            <button onclick="submitForm()">Continuar</button>
+        </div>
+    </div>
+
+    <!-- Modal de error -->
+    <div id="error-message" {% if session.cambio_contrasena_exitoso == False %}class="active"{% endif %}>
+        <div class="error-content">
+            <h2>¡Contraseñas diferentes ó codigo incorrecto!</h2>
+            <button onclick="closeErrorMessage()">Cerrar</button>
+        </div>
+    </div>
+
+    <script>
+        function closeErrorMessage() {
+            document.getElementById('error-message').style.display = 'none';
+        }
+
+        function submitForm() {
+            window.location.href = 'login';
+        }
+    </script> 
+
+</body>
+</html>

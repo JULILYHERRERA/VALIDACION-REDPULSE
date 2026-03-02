@@ -1,0 +1,172 @@
+@import url('https://fonts.googleapis.com/css2?family=Quicksand:wght@400;600&display=swap');
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: 'Quicksand', sans-serif;
+    background-color: #f2f4f8; /* Color de fondo más suave */
+    color: #333;
+}
+
+.container {
+    max-width: 800px;
+    margin: auto;
+    padding: 20px;
+}
+
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: #ffffff;
+    padding: 15px;
+    border-radius: 10px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    margin-bottom: 20px;
+}
+
+.header h1 {
+    font-size: 32px;
+    font-weight: 600;
+}
+
+.header .red {
+    color: #000000; /* Color negro para "Red" */
+}
+
+.header .pulse {
+    color: #B93A32; /* Rojo vibrante para "Pulse" */
+}
+
+.header nav ul {
+    list-style: none;
+    display: flex;
+    gap: 15px;
+}
+
+.header nav a {
+    text-decoration: none;
+    color: #333;
+    font-weight: bold;
+    transition: color 0.3s;
+}
+
+.header nav a:hover {
+    color: #B93A32; /* Color al pasar el ratón */
+}
+
+.main-content {
+    background-color: #ffffff;
+    padding: 30px; /* Aumentado para mejor espaciado */
+    border-radius: 10px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+.welcome {
+    margin-bottom: 20px;
+}
+
+.welcome h2 {
+    font-size: 26px;
+    color: #B93A32; /* Rojo vibrante */
+}
+
+.welcome h3 {
+    font-size: 22px;
+    margin: 10px 0;
+}
+
+.blood-info {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.blood-type {
+    font-size: 22px;
+    font-weight: bold;
+    color: #B93A32; /* Rojo vibrante */
+    padding: 10px 20px;
+    background-color: #ffe9e5; /* Fondo suave */
+    border-radius: 5px;
+}
+
+.request-now {
+    display: flex;
+    align-items: center;
+}
+
+.profile-picture {
+    width: 120px; /* Tamaño aumentado */
+    height: 120px; /* Tamaño aumentado */
+    border-radius: 50%;
+    margin-right: 15px; /* Espaciado ajustado */
+    border: 2px solid #B93A32; /* Añadido borde a la imagen */
+    object-fit: cover; /* Mantiene la proporción de la imagen */
+}
+
+.request-button {
+    font-family: 'Quicksand', sans-serif;
+    background-color: #B93A32;
+    color: #fff;
+    border: none;
+    padding: 12px 24px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-weight: bold;
+    transition: background-color 0.3s;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+.donate-button:hover {
+    background-color: #B93A32; /* Color más oscuro al pasar el ratón */
+}
+
+.stats {
+    display: flex;
+    justify-content: space-between;
+    gap: 10px;
+}
+
+.stat {
+    background-color: #ffffff;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    flex: 1;
+    text-align: center;
+}
+
+.stat h4 {
+    font-family: 'Quicksand', sans-serif;
+    font-size: 18px;
+    margin-bottom: 10px;
+    color: #B93A32; /* Rojo vibrante */
+}
+
+.stat p {
+    font-size: 24px; /* Tamaño de fuente aumentado para los valores */
+    font-weight: bold;
+}
+
+.points-link, .historical-link{
+    text-decoration: none; /* Sin subrayado */
+    color: inherit; /* Hereda el color del texto */
+    background-color: #ffffff; /* Fondo blanco para el cuadro */
+    padding: 20px; /* Espaciado interno */
+    border-radius: 8px; /* Bordes redondeados */
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1); /* Sombra */
+    transition: background-color 0.3s; /* Transición suave para el color de fondo */
+}
+
+.points-link:hover, .historical-link:hover{
+    background-color: #f8f8f8; /* Color de fondo al pasar el ratón */
+}
+
+.no-underline {
+  text-decoration: none;
+}

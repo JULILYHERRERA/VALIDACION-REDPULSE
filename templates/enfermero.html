@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RedPulse - Enfermero</title>
+    <link rel="stylesheet" href="/css/stylesEnfermero.css">
+</head>
+<body>
+    <div class="container">
+        <header class="header">
+            <a class="no-underline">
+                <h1><span class="red">Red</span><span class="pulse">Pulse</span></h1>
+            </a>
+            <nav>
+                <ul>
+                    <li><a href="{{ url_for('logout') }}">Cerrar Sesión</a></li>
+                </ul>
+            </nav>
+        </header>
+
+        <main class="main-content">
+            <section class="welcome">
+                <h2>Bienvenido Enfermero/a {{ nombre_enfermero }} </h2>
+            </section>
+
+            <form method="POST">
+                <div class="form-group">
+                    <label for="cedula">Ingrese Cédula del Donante</label>
+                    <input type="text" id="cedula" name="cedula" placeholder="Ingrese la cédula" required>
+
+                    <select name="tipo_documento" required>
+                        <option value="">Seleccione Tipo de Documento</option>
+                        <option value="Cedula de Ciudadania">Cédula de Ciudadanía</option>
+                        <option value="Cedula de Extranjeria">Cédula de Extranjería</option>
+                    </select>
+
+                </div>
+                <button type="submit" class="submit-button">Verificar Cédula</button>
+            </form>
+
+        </main>
+    </div>
+
+    <!-- Modal de éxito -->
+    <div id="success-message" {% if session.enfermero_usuario_verificacion == True %}class="active"{% endif %}>
+        <div class="success-content">
+            <h2>¡Cédula verificada exitosamente. Redirigiendo...!</h2>
+            <button onclick="submitForm()">Continuar</button>
+        </div>
+    </div>
+
+    <!-- Modal de error -->
+    <div id="error-message" {% if session.enfermero_usuario_verificacion == False %}class="active"{% endif %}>
+        <div class="error-content">
+            <h2>¡La cuenta no existe!</h2>
+            <button onclick="closeErrorMessage()">Cerrar</button>
+        </div>
+    </div>
+
+    <script>
+        function closeErrorMessage() {
+            document.getElementById('error-message').style.display = 'none';
+        }
+
+        function submitForm() {
+            window.location.href = 'agregar_donacion';
+        }
+    </script> 
+
+</body>
+</html>

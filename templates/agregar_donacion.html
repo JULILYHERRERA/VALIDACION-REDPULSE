@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RedPulse - Agregar Donación</title>
+    <link rel="stylesheet" href="/css/stylesAgregarDonacion.css">
+</head>
+<body>
+    <div class="container">
+        <!-- Header con menú -->
+        <header class="header">
+            <a href="#" class="no-underline">
+                <h1><span class="red">Red</span><span class="pulse">Pulse</span></h1>
+            </a>
+            <nav>
+                <ul>
+                    <li><a href="{{ url_for('enfermero') }}">Inicio</a></li>
+                    <li><a href="{{ url_for('logout') }}">Cerrar Sesion</a></li>
+                </ul>
+            </nav>
+        </header>
+
+        <!-- Contenido principal -->
+        <main class="main-content">
+            <section class="welcome">
+                <h2>Bienvenido Enfermero</h2>
+                <p>Ingrese los detalles de la donación realizada por el usuario.</p>
+            </section>
+
+            <!-- Formulario de donación -->
+            <form class="donation-form" method="POST">
+                <label for="quantity">Cantidad Donada (ml)</label>
+                <input type="number" id="quantity" name="cantidad_donada" required min="100" max="500" placeholder="Ingrese la cantidad en ml">
+                
+                <label for="donation-date">Fecha de la Donación</label>
+                <input type="date" name="fecha_donacion" id="donation-date" required>
+
+                <button type="submit">Registrar Donación</button>
+            </form>
+        </main>
+    </div>
+
+    <!-- Modal de éxito -->
+    <div id="success-message" {% if session.donacion_exitosa == True %}class="active"{% endif %}>
+        <div class="success-content">
+            <h2>¡Donación registrada exitosamente!</h2>
+            <button onclick="submitForm()">Cerrar</button>
+        </div>
+    </div>
+
+    <!-- Modal de error -->
+    <div id="error-message" {% if session.donacion_exitosa == False %}class="active"{% endif %}>
+        <div class="error-content">
+            <h2>¡No se pudo ingresar la donación!</h2>
+            <button onclick="closeErrorMessage()">Cerrar</button>
+        </div>
+    </div>
+
+    <script>
+        function closeErrorMessage() {
+            document.getElementById('error-message').style.display = 'none';
+        }
+
+        function submitForm() {
+            document.getElementById('success-message').style.display = 'none';
+        }
+    </script> 
+
+</body>
+</html>

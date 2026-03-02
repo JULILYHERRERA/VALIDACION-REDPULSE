@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RedPulse - Historial Movimientos</title>
+    <link rel="stylesheet" href="/css/stylesHistorialDeMovimientos.css">
+</head>
+<body>
+    <div class="container">
+        <header class="header">
+            <a href="{{ url_for('home') }}" class="no-underline">
+                <h1><span class="red">Red</span><span class="pulse">Pulse</span></h1>
+            </a>
+            <nav>
+                <ul>
+                    <li><a href="{{ url_for('perfil') }}">Perfil</a></li>
+                    <li><a href="{{ url_for('chatbot') }}">ChatBot</a></li>
+                    <li><a href="{{ url_for('puntos') }}">Puntos</a></li>
+                    <li><a href="{{ url_for('logout') }}">Cerrar Sesión</a></li>
+                </ul>
+            </nav>  
+        </header>
+
+        <main class="main-content">
+            <a href="javascript:void(0);" onclick="history.back()" class="go-back">
+                &#8592; Regresar
+            </a>
+            
+            <h2>Movimientos</h2>
+
+            {% for registro in user_data['registros'] %}
+            <div class="historical">
+                <h3>Movimiento {{ loop.index }}</h3>
+                <p>
+                    Usted realizó una {{ registro['TIPO_REGISTRO'] }} el {{ registro['FECHA'] }}
+                    de {{ registro['CANTIDAD'] }} ml
+                    {% if registro['PRIORIDAD'] %} con una prioridad de {{ registro['PRIORIDAD'] }}{% endif %}
+                    {% if registro['ESTADO'] %} con estado actual {{ registro['ESTADO'] }}{% endif %}.
+                </p>
+            </div>
+            {% endfor %}
+            
+            <button onclick="redirectToView()" class="back-button">Volver</button>
+        </main>
+
+    </div>
+
+    <script>
+        function redirectToView() {
+            window.location.href = 'perfil'; // Cambia 'tu-vista.html' por la URL a la que quieras redirigir
+        }
+    </script>
+</body>
+</html>

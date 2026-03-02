@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RedPulse - ChatBot</title>
+    <link rel="stylesheet" href="/css/stylesChatbot.css">
+</head>
+<body>
+
+    <!-- Botón Regresar -->
+    <a href="javascript:void(0);" onclick="history.back()" class="go-back">
+        &#8592; Regresar
+    </a>
+    
+    <!-- Encabezado RedPulse -->
+    <header class="header">
+        <a href="{{ url_for('home') }}" class="no-underline">
+            <h1><span class="red">Red</span><span class="pulse">Pulse</span><span class="dot">●</span></h1>
+        </a>
+    </header>
+
+
+    <!-- Contenedor del Chatbot -->
+    <div class="chatbot-container">
+        <!-- Ventana de mensajes -->
+        <div id="chat-window" class="chat-window">
+            <div class="message bot-message">¡Hola {{ user_data.get('nombre','') }}! Tu rol es {{ rol_chat }}.¿En qué puedo ayudarte?</div>
+        </div>
+        
+        <!-- Entrada de usuario -->
+        <div class="chat-input-container">
+            <input type="text" id="userInput" placeholder="Escribe tu mensaje aquí..." autocomplete="off">
+            <button onclick="sendMessage()">Enviar</button>
+        </div>
+    </div>
+
+    
+<script>
+    const endpointChat = "{{ '/chatbot_donante' if rol_chat == 'DONANTE' else '/chatbot_solicitante' }}";
+
+    function sendMessage() {
+        const userInput = document.getElementById('userInput');
+        const message = userInput.value.trim();
+        if (message) {
+            const chatWindow = document.getElementById('chat-window');
+
+            const userMessage = document.createElement('div');
+            userMessage.classList.add('message', 'user-message');
+            userMessage.textContent = message;
+            chatWindow.appendChild(userMessage);
+
+            userInput.value = '';
+
+            fetch(endpointChat, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ mensaje_ingresado: message })
+            })
+            .then(async (response) => {
+                if (response.status === 401 || response.status === 403) {
+                    const result = await response.json();
+                    const botMessage = document.createElement('div');
+                    botMessage.classList.add('message', 'bot-message');
+                    botMessage.textContent = result.respuesta;
+                    chatWindow.appendChild(botMessage);
+                    chatWindow.scrollTop = chatWindow.scrollHeight;
+
+                    if (response.status === 401) {
+                        window.location.href = '/';
+                    }
+                    return null;
+                }
+                return response.json();
+            })
+            .then(result => {
+                if (!result) return;
+
+                const botMessage = document.createElement('div');
+                botMessage.classList.add('message', 'bot-message');
+                botMessage.textContent = result.respuesta;
+                chatWindow.appendChild(botMessage);
+
+                chatWindow.scrollTop = chatWindow.scrollHeight;
+            })
+            .catch(error => {
+                console.error('Error al procesar la solicitud:', error);
+            });
+        }
+    }
+</script>
+</body>
+</html>

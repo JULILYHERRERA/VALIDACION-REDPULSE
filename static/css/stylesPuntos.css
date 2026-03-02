@@ -1,0 +1,230 @@
+@import url('https://fonts.googleapis.com/css2?family=Quicksand:wght@400;600&display=swap');
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: 'Quicksand', sans-serif;
+    background-color: #f2f4f8;
+    color: #333;
+    padding: 20px;
+}
+
+.container {
+    max-width: 800px;
+    margin: auto;
+    padding: 20px;
+}
+
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: #ffffff;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    margin-bottom: 30px;
+}
+
+.header h1 {
+    font-size: 32px;
+    font-weight: 600;
+}
+
+.header .red {
+    color: #000000;
+}
+
+.header .pulse {
+    color: #B93A32;
+}
+
+.header nav ul {
+    list-style: none;
+    display: flex;
+    gap: 15px;
+}
+
+.header nav a {
+    text-decoration: none;
+    color: #333;
+    font-weight: bold;
+    transition: color 0.3s;
+}
+
+.header nav a:hover {
+    color: #B93A32;
+}
+
+.points-section {
+    text-align: center;
+    background-color: #ffffff;
+    padding: 30px;
+    border-radius: 10px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    margin-bottom: 30px;
+}
+
+.points-section h2 {
+    font-size: 28px;
+    color: #B93A32;
+    margin-bottom: 10px;
+}
+
+.points-section p {
+    font-size: 24px;
+    color: #333;
+    font-weight: bold;
+}
+
+.card-container {
+  flex: 1;
+  padding-right: 20px; /* Espacio entre el contenido y la imagen */
+}
+
+.business-card {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color: #ffffff;
+  padding: 15px;
+  border-radius: 10px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  margin-bottom: 20px;
+}
+
+.business-card h3 {
+    font-size: 20px;
+    color: #333;
+    font-weight: 600;
+}
+
+.business-card p {
+    font-size: 16px;
+    color: #666;
+}
+
+.redeem-button {
+    font-family: 'Quicksand', sans-serif;
+    margin-top: 20px;
+    background-color: #B93A32;
+    color: #ffffff;
+    font-size: 16px;
+    font-weight: bold;
+    padding: 10px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    align-self: start;
+    transition: background-color 0.3s;
+}
+
+.redeem-button:hover {
+    background-color: #a22e2b;
+}
+
+.image-container {
+  width: 140px; /* Ajusta el tamaño de la imagen según prefieras */
+  height: 120px;
+  overflow: hidden;
+}
+
+.image-container img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover; /* Mantiene la imagen dentro del contenedor sin deformarla */
+}
+
+.no-underline {
+  text-decoration: none;
+}
+
+/* Estilos para el mensaje de éxito */
+#success-message {
+    display: none; /* Oculto por defecto */
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    justify-content: center;
+    align-items: center;
+    z-index: 10;
+}
+
+#success-message.active {
+    display: flex; /* Mostrar el mensaje cuando se activa la clase */
+}
+
+.success-content {
+    background-color: white;
+    padding: 30px;
+    text-align: center;
+    border-radius: 10px;
+    box-shadow: 0px 5px 15px rgba(0, 0, 0, 0.3);
+}
+
+.success-content h2 {
+    margin-bottom: 20px;
+}
+
+/* Estilos para el mensaje de error */
+#error-message {
+    display: none; /* Oculto por defecto */
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    justify-content: center;
+    align-items: center;
+    z-index: 10;
+}
+
+#error-message.active {
+    display: flex; /* Mostrar el mensaje cuando se activa la clase */
+}
+
+.error-content {
+    background-color: white;
+    padding: 30px;
+    text-align: center;
+    border-radius: 10px;
+    box-shadow: 0px 5px 15px rgba(0, 0, 0, 0.3);
+}
+
+.error-content h2 {
+    margin-bottom: 20px;
+}
+
+/* Estilos para los botones */
+.error-content button, .success-content button {
+    background-color: #B93A32;
+    color: #fff;
+    border: none;
+    padding: 10px 20px;
+    font-size: 16px;
+    cursor: pointer;
+    border-radius: 5px;
+}
+
+.go-back {
+    position: absolute;
+    top: 20px;
+    left: 20px;
+    font-size: 16px;
+    color: #333;
+    text-decoration: none;
+    font-weight: bold;
+    transition: color 0.3s;
+}
+
+.go-back:hover {
+    color: #B93A32;
+}

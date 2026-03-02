@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RedPulse - Estadisticas</title>
+    <link rel="stylesheet" href="/css/stylesEstadisticas.css">
+    
+</head>
+<body>
+    <div class="container">
+        <header class="header">
+            <a class="no-underline">
+                <h1><span class="red">Red</span><span class="pulse">Pulse</span></h1>
+            </a>
+            <nav>
+                <ul>
+                    <li><a href="{{ url_for('solicitudes_pendientes') }}">Solicitudes de Donacion</a></li>
+                    <li><a href="{{ url_for('logout') }}">Cerrar sesión</a></li>
+                </ul>
+            </nav>
+        </header>
+
+        <main class="main-content">
+            <section class="charts">
+                <div class="chart-container">
+                    <h2>Donaciones por Mes</h2>
+                    <canvas id="monthlyDonationsChart"></canvas>
+                </div>
+                <div class="chart-container">
+                    <h2>Cantidad de Sangre por Tipo</h2>
+                    <canvas id="bloodTypeChart"></canvas>
+                </div>
+            </section>
+        </main>
+        
+    </div>
+
+    <!-- Enlace a Chart.js desde CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <script>
+        // Datos obtenidos desde Flask (se convierten de JSON a objetos de JavaScript)
+        const donacionesPorMes = JSON.parse('{{ donaciones_por_mes | safe }}');
+        const sangrePorTipo = JSON.parse('{{ sangre_por_tipo | safe }}');
+
+        // Gráfico de donaciones por mes
+        const monthlyDonationsCtx = document.getElementById('monthlyDonationsChart').getContext('2d');
+        const monthlyDonationsChart = new Chart(monthlyDonationsCtx, {
+            type: 'bar',
+            data: {
+                labels: Object.keys(donacionesPorMes),
+                datasets: [{
+                    label: 'Donaciones',
+                    data: Object.values(donacionesPorMes),
+                    backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                    borderColor: 'rgba(75, 192, 192, 1)',
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
+                }
+            }
+        });
+
+        // Gráfico de cantidad de sangre por tipo
+        const bloodTypeCtx = document.getElementById('bloodTypeChart').getContext('2d');
+        const bloodTypeChart = new Chart(bloodTypeCtx, {
+            type: 'doughnut',
+            data: {
+                labels: Object.keys(sangrePorTipo),
+                datasets: [{
+                    label: 'Cantidad de Sangre (ml)',
+                    data: Object.values(sangrePorTipo),
+                    backgroundColor: [
+                        '#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0', '#9966FF', '#FF9F40', '#FF6384', '#36A2EB'
+                    ],
+                    borderColor: '#fff',
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true
+            }
+        });
+    </script>
+
+</body>
+</html>

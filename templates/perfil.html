@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RedPulse</title>
+    <link rel="stylesheet" href="/css/stylesPerfil.css">
+</head>
+<body>
+    <div class="container">
+        <header class="header">
+            <a href="{{ url_for('home') }}" class="no-underline">
+                <h1><span class="red">Red</span><span class="pulse">Pulse</span></h1>
+            </a>
+            <nav>
+                <ul>
+                    <li><a href="{{ url_for('puntos') }}">Puntos</a></li>
+                    <li><a href="{{ url_for('chatbot') }}">ChatBot</a></li>
+                    <li><a href="{{ url_for('movimientos') }}">Movimientos</a></li>
+                    <li><a href="{{ url_for('logout') }}">Cerrar Sesión</a></li>
+                </ul>
+            </nav>
+        </header>
+
+        <main class="main-content">
+            <section class="welcome">
+                <h2>Bienvenido/a</h2>
+                <h3>{{ user_data['nombre'] }}</h3>
+                <p>La verdadera alegría de la vida consiste en dar el regalo de la vida, <strong>dona sangre</strong></p>
+            </section>
+
+            <section class="blood-info">
+                <div class="blood-type">SANGRE: {{ user_data['tipo_de_sangre'] }}</div>
+                <div class="request-now">
+                    <img src="{{ user_data['perfil_imagen_link'] }}" referrerpolicy="no-referrer" alt="Profile Picture" class="profile-picture">
+                    <button onclick="solicitar_donacion_ruta()" class="request-button">Solicitar Sangre</button>
+                </div>
+            </section>
+            <section class="stats">
+                <a href="{{ url_for('puntos') }}" class="stat points-link">
+                    <div>
+                        <h4>Puntos</h4>
+                        <p>{{ user_data['puntos'] }}</p>
+                    </div>
+                </a>
+                <div class="stat">
+                    <h4>Donado</h4>
+                    <p>{{ user_data['total_donado'] }} ml</p>
+                </div>
+
+                <a href="{{ url_for('movimientos') }}" class="stat historical-link">
+                    <div>
+                        <h4>Movimientos</h4>
+                        <p>{{ user_data['cnt_registros'] }}</p>
+                    </div>
+                </a>
+
+            </section>
+            
+            
+        </main>
+    </div>
+
+    <script>
+        function solicitar_donacion_ruta() {
+            window.location.href = 'solicitud_donacion'; // Cambia la URL a la que quieras redirigir
+        }
+    </script>
+
+</body>
+</html>

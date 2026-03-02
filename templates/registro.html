@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RedPulse - Registro</title>
+    <link rel="stylesheet" href="/css/stylesRegistro.css">
+
+</head>
+<body>
+
+    <!-- Modal Container -->
+    <div class="modal">
+        <!-- Modal Left (Form Section) -->
+        <div class="modal-left">
+          <a href="{{ url_for('home') }}" class="close-btn">&times;</a>
+          <header class="header">
+            <h1><span class="red">Red</span><span class="pulse">Pulse</span></h1>
+          </header>
+
+            <h2>Crear Cuenta</h2>
+            <form id="registerForm" method="POST" enctype="multipart/form-data">
+                <div class="name-lastname">
+                    <input type="text" name="nombre" placeholder="Nombre" required>
+                    <input type="text" name="apellido" placeholder="Apellido" required>
+                </div>
+                <select name="tipo_documento" required>
+                    <option value="">Seleccione Tipo de Documento</option>
+                    <option value="Cedula de Ciudadania">Cédula de Ciudadanía</option>
+                    <option value="Cedula de Extranjeria">Cédula de Extranjería</option>
+                </select>
+                <input type="text" name="numero_documento" placeholder="Número de Documento" required>
+                <select id="blood-type" name="tipo_de_sangre" required>
+                    <option value="">Seleccione su tipo de sangre</option>
+                    <option value="A+">A+</option>
+                    <option value="A-">A-</option>
+                    <option value="B+">B+</option>
+                    <option value="B-">B-</option>
+                    <option value="AB+">AB+</option>
+                    <option value="AB-">AB-</option>
+                    <option value="O+">O+</option>
+                    <option value="O-">O-</option>
+                </select>
+                <input type="email" name="correo" placeholder="Correo Electrónico" required>
+                <input type="password" name="contrasena" placeholder="Contraseña" required>
+                <input type="password" name="confirmar_contrasena" placeholder="Confirmar Contraseña" required>
+                <!-- Nueva Sección de Imagen -->
+                <input type="file" name="perfil_imagen" accept=".jpg, .jpeg, .png" placeholder="foto de perfil (opcional)">
+                <div class="register-terms">
+                    <input type="checkbox" required> Acepto los <a href="#">Términos y Condiciones</a>
+                </div>
+                <button type="submit">Crear Cuenta</button>
+            </form>
+        </div>
+
+        <div class="modal-right"></div>
+    </div>
+
+    <!-- Modal de éxito -->
+    <div id="success-message" {% if session.registarse_verificacion_resultado == False %}class="active"{% endif %}>
+        <div class="success-content">
+            <h2>¡Cuenta creada exitosamente!</h2>
+            <button onclick="submitForm()">Volver al inicio</button>
+        </div>
+    </div>
+
+    <!-- Modal de error -->
+    <div id="error-message" {% if session.registarse_verificacion_resultado == True %}class="active"{% endif %}>
+        <div class="error-content">
+            <h2>¡La cuenta ya existe ó el correo ya esta siendo utilizado!</h2>
+            <button onclick="closeErrorMessage()">Cerrar</button>
+        </div>
+    </div>
+
+    <script>
+        function closeErrorMessage() {
+            document.getElementById('error-message').style.display = 'none';
+        }
+
+        function submitForm() {
+            window.location.href = '/';
+        }
+    </script> 
+
+</body>
+</html>

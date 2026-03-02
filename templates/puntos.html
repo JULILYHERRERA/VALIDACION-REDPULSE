@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RedPulse - Mis Puntos</title>
+    <link rel="stylesheet" href="/css/stylesPuntos.css">
+</head>
+<body>
+    <div class="container">
+        <header class="header">
+            <a href="{{ url_for('home') }}" class="no-underline">
+                <h1><span class="red">Red</span><span class="pulse">Pulse</span></h1>
+            </a>
+            <nav>
+                <ul>
+                  <li><a href="{{ url_for('perfil') }}">Perfil</a></li>
+                  <li><a href="{{ url_for('chatbot') }}">ChatBot</a></li>
+                  <li><a href="{{ url_for('movimientos') }}">Movimientos</a></li>
+                  <li><a href="{{ url_for('logout') }}">Cerrar Sesión</a></li>
+                </ul>
+            </nav>
+        </header>
+
+        <main class="main-content">
+          <a href="javascript:void(0);" onclick="history.back()" class="go-back">
+            &#8592; Regresar
+          </a>
+        
+            <!-- Sección de puntos -->
+            <section class="points-section">
+                <h2>Total de Puntos Acumulados</h2>
+                <p id="total-puntos"> {{ user_data['puntos'] }} puntos</p>
+            </section>
+
+            <!-- Tarjetas de negocios -->
+            <section class="card-container">
+              <div class="business-card">
+                <div class="card-content">
+                  <h3>Restaurante Delicias | 6.000 puntos</h3>
+                  <p>Redime tus puntos para obtener descuentos en comidas y bebidas.</p>
+                  <button class="redeem-button" data-puntos="6000" onclick="getSelectedPoints(this)">Redimir Puntos</button>
+                </div>
+                <div class="image-container">
+                  <img src="https://png.pngtree.com/png-clipart/20240103/original/pngtree-burrito-clipart-food-png-image_14002429.png" alt="Logo del negocio">
+                </div>
+              </div>
+            
+              <div class="business-card">
+                <div class="card-content">
+                  <h3>Tiendas Verdes | 4.000 puntos</h3>
+                  <p>Descuentos en productos naturales y orgánicos para una vida más saludable.</p>
+                  <button class="redeem-button" data-puntos="4000" onclick="getSelectedPoints(this)">Redimir Puntos</button>
+                </div>
+                <div class="image-container">
+                  <img src="https://static.vecteezy.com/system/resources/thumbnails/024/108/075/small/fresh-herbal-tea-cup-with-green-leaves-isolated-on-transparent-background-png.png" alt="Logo del negocio">
+                </div>
+              </div>
+            
+              <div class="business-card">
+                <div class="card-content">
+                  <h3>CineMovil | 8.000 puntos</h3>
+                  <p>Canjea tus puntos por entradas y snacks en nuestra cadena de cines.</p>
+                  <button class="redeem-button" data-puntos="8000" onclick="getSelectedPoints(this)">Redimir Puntos</button>
+                </div>
+                <div class="image-container">
+                  <img src="https://static.vecteezy.com/system/resources/previews/011/720/979/non_2x/cinema-tickets-with-pop-corn-drink-amd-glasses-free-png.png" alt="Logo del negocio">
+                </div>
+              </div>
+            
+              <div class="business-card">
+                <div class="card-content">
+                  <h3>Moda y Estilo | 10.000 puntos</h3>
+                  <p>Utiliza tus puntos para obtener descuentos en ropa y accesorios de moda.</p>
+                  <button class="redeem-button" data-puntos="10000" onclick="getSelectedPoints(this)">Redimir Puntos</button>
+                </div>
+                <div class="image-container">
+                  <img src="https://static.vecteezy.com/system/resources/thumbnails/050/077/322/small/a-simple-brown-paper-shopping-bag-with-knotted-handles-png.png" alt="Logo del negocio">
+                </div>
+              </div>
+            </section>
+            
+        </main>
+    </div>
+
+    <!-- Modal de éxito -->
+    <div id="success-message" class="modal" style="display: none;">
+      <div class="success-content">
+          <h2>¡Compra exitosa, verifique su correo!</h2>
+          <button onclick="submitForm()">Cerrar</button>
+      </div>
+    </div>
+
+    <!-- Modal de error -->
+    <div id="error-message" class="modal" style="display: none;">
+        <div class="error-content">
+            <h2>¡No tienes suficiente puntos!</h2>
+            <button onclick="closeErrorMessage()">Cerrar</button>
+        </div>
+    </div>
+
+    <script>
+      function getSelectedPoints(element) {
+          // Ocultar mensajes anteriores al hacer una nueva selección
+          document.getElementById('success-message').style.display = 'none';
+          document.getElementById('error-message').style.display = 'none';
+  
+          const puntos = element.getAttribute('data-puntos'); // Obtener los puntos del atributo data-puntos
+  
+          // Crear un objeto con los datos a enviar
+          const data = { puntos_seleccionados: puntos };
+  
+          // Hacer la petición POST
+          fetch('/puntos', {
+              method: 'POST',
+              headers: {
+                  'Content-Type': 'application/json',
+              },
+              body: JSON.stringify(data)
+          })
+          .then(response => response.json()) // Esperar la respuesta y convertirla a JSON
+          .then(result => {
+              // Suponiendo que el servidor retorna un JSON con una propiedad 'success'
+              if (result.success) {
+                  // Mostrar el modal de éxito
+                  document.getElementById('success-message').style.display = 'flex';
+                  document.getElementById('total-puntos').innerText = result.nuevos_puntos + ' puntos';
+              } else {
+                  // Mostrar el modal de error
+                  document.getElementById('error-message').style.display = 'flex';
+              }
+          })
+          .catch(error => {
+              console.error('Error al procesar la solicitud:', error);
+              // Aquí podrías manejar errores adicionales si lo deseas
+          });
+      }
+  
+      function closeErrorMessage() {
+          document.getElementById('error-message').style.display = 'none';
+      }
+  
+      function submitForm() {
+          document.getElementById('success-message').style.display = 'none';
+      }
+
+  </script>
+  
+</body>
+</html>

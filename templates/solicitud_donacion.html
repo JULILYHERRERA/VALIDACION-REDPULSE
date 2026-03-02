@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RedPulse - Solicitud de Sangre</title>
+    <link rel="stylesheet" href="/css/stylesSolicitudDonacion.css">
+</head>
+<body>
+    <a href="javascript:void(0);" onclick="history.back()" class="go-back">
+        &#8592; Regresar
+    </a>
+
+    <div class="container">
+        <header class="header">
+            <a href="{{ url_for('home') }}" class="no-underline">
+                <h1><span class="red">Red</span><span class="pulse">Pulse</span></h1>
+            </a>
+            <nav>
+                <ul>
+                    <li><a href="{{ url_for('perfil') }}">Perfil</a></li>
+                    <li><a href="{{ url_for('puntos') }}">Puntos</a></li>
+                    <li><a href="{{ url_for('chatbot') }}">ChatBot</a></li>
+                    <li><a href="{{ url_for('movimientos') }}">Movimientos</a></li>
+                    <li><a href="{{ url_for('logout') }}">Cerrar Sesión</a></li>
+                </ul>
+            </nav>
+        </header>
+
+        <main class="main-content">
+            <section class="welcome">
+                <h2>Solicitud de Sangre</h2>
+                <p>Complete los siguientes datos para realizar la solicitud de sangre.</p>
+            </section>
+
+            <section class="request-form">
+
+                <form method="post">
+
+                    <label for="quantity">Cantidad (ml):</label>
+                    <input type="number" id="quantity" name="cantidad_sangre_donada" min="100" max="500" required>
+
+                    <label for="reason">Razón de la Solicitud:</label>
+                    <textarea id="reason" name="razon" rows="3" required></textarea>
+
+                    <label for="comments">Comentarios Adicionales:</label>
+                    <textarea id="comments" name="comentarios" rows="3"></textarea>
+
+                    <label for="priority">Prioridad:</label>
+                    <select id="priority" name="prioridad_solicitud" required>
+                        <option value="">Seleccione</option>
+                        <option value="1">1 - Reserva Inmediata</option>
+                        <option value="2">2 - Emergencia</option>
+                        <option value="3">3 - Urgencia</option>
+                        <option value="4">4 - Urgencia Menor</option>
+                        <option value="5">5 - Sin Urgencia</option>
+                    </select>
+
+                    <div class="button-container">
+                        <button type="submit" class="confirm-button">Enviar Solicitud</button>
+                        <button type="button" class="cancel-button" onclick="window.location.href='perfil'">Cancelar</button>
+                    </div>
+                </form>
+
+            </section>
+
+        </main>
+    </div>
+
+    <!-- Modal de éxito -->
+    <div id="success-message" {% if session.registro_creado == True %}class="active"{% endif %}>
+        <div class="success-content">
+            <h2>¡Registro ingresado exitosamente!</h2>
+            <button onclick="submitForm()">Cerrar</button>
+        </div>
+    </div>
+
+    <!-- Modal de error -->
+    <div id="error-message" {% if session.registro_creado == False %}class="active"{% endif %}>
+        <div class="error-content">
+            <h2>¡No fue posible guardar su Registro!</h2>
+            <button onclick="closeErrorMessage()">Cerrar</button>
+        </div>
+    </div>
+
+    <script>
+        function closeErrorMessage() {
+            document.getElementById('error-message').style.display = 'none';
+        }
+
+        function submitForm() {
+            document.getElementById('success-message').style.display = 'none';
+        }
+
+    </script> 
+</body>
+</html>
