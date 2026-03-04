@@ -361,10 +361,6 @@ def solicitar_recuperacion():
     
     return render_template('solicitar_recuperacion.html')
 
-
-
-
-
 @app.route('/reestablecer_contrasena', methods=['GET', 'POST'])
 def reestablecer_contrasena():
     # Verificar si ya hay datos de usuario en la sesión
@@ -390,10 +386,9 @@ def reestablecer_contrasena():
         session['correo_recuperacion_asociado'] = None
         session['correo_valido_resultado'] = None
     
-    return render_template('reestablecer_contrasena.html')@app.route('/chatbot', methods=['GET', 'POST'])
+    return render_template('reestablecer_contrasena.html')
 
-
-@app.route('/chatbot', methods=['GET'])
+@app.route('/chatbot', methods=['GET', 'POST'])
 def chatbot():
     user_data = session.get('user_data')
 
