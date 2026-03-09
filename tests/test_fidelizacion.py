@@ -17,7 +17,7 @@ def app():
     return app
 
 
-# 🟢 CASO 1: Tiene puntos suficientes
+# Camino 1: Tiene puntos suficientes
 def test_procesar_puntos_con_suficientes_puntos(app):
     with app.test_request_context():
 
@@ -43,7 +43,7 @@ def test_procesar_puntos_con_suficientes_puntos(app):
             mock_email.assert_called_once()
 
 
-# 🔴 CASO 2: No tiene puntos suficientes
+# Camino 2: No tiene puntos suficientes
 def test_procesar_puntos_sin_puntos_suficientes(app):
     with app.test_request_context():
 

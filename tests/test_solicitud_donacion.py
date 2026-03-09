@@ -8,7 +8,6 @@ import pytest
 from flask import session
 from src.app import app   
 
-
 @pytest.fixture
 def client():
     app.config['TESTING'] = True
@@ -17,7 +16,7 @@ def client():
         yield client
 
 
-# 🔴 CASO 1: Usuario sin sesión
+# Camino 1: Usuario sin sesión
 def test_solicitud_sin_sesion(client):
     response = client.get('/solicitud_donacion')
 
@@ -25,7 +24,7 @@ def test_solicitud_sin_sesion(client):
     assert '/home' in response.location
 
 
-# 🟢 CASO 2: Usuario con sesión (GET)
+# Camino 2: Usuario con sesión (GET)
 def test_solicitud_con_sesion_get(client):
     with client.session_transaction() as sess:
         sess['user_data'] = {'nombre': 'Xime'}
@@ -36,7 +35,7 @@ def test_solicitud_con_sesion_get(client):
     assert b"solicitud" in response.data
 
 
-# 🔵 CASO 3: Usuario con sesión (POST)
+# Camino 3: Usuario con sesión (POST)
 @patch("src.registro_servicio.crearRegistro")  
 def test_solicitud_con_sesion_post(mock_crearRegistro, client):
 

@@ -89,6 +89,46 @@ def return_home():
 
 # Rutas de acceso para un usuario registrado
 
+@app.route('/actualizar_foto_perfil', methods=['POST'])
+def actualizar_foto_perfil():
+    # Verificar que el usuario está autenticado
+    user_data = session.get('user_data')
+    if not user_data:
+        return jsonify({'success': False, 'error': 'No autorizado'}), 401
+
+    # Obtener el archivo de imagen
+    if 'foto' not in request.files:
+        return jsonify({'success': False, 'error': 'No se envió ninguna imagen'}), 400
+    
+    imagen = request.files['foto']
+    if imagen.filename == '':
+        return jsonify({'success': False, 'error': 'Archivo vacío'}), 400
+
+    # Subir a Imgur usando la función existente
+    nuevo_link, nuevo_deletehash = generarUsuarioImagen(imagen, imgur_handler)
+
+    if not nuevo_link or nuevo_link == secret_config.DEFAULT_PROFILE_PICTURE:
+        return jsonify({'success': False, 'error': 'Error al subir la imagen a Imgur'}), 500
+
+    # Actualizar en la base de datos
+    try:
+        # Necesitas los identificadores del usuario desde la sesión
+        numero_documento = user_data['numero_documento']
+        tipo_documento = user_data['tipo_documento']
+        
+        # Ejecutar UPDATE (asumiendo que tienes una función para ello)
+        actualizar_imagen_usuario(numero_documento, tipo_documento, nuevo_link, nuevo_deletehash)
+        
+        # Actualizar la sesión
+        session['user_data']['perfil_imagen_link'] = nuevo_link
+        session['user_data']['perfil_imagen_deletehash'] = nuevo_deletehash
+        session.modified = True  # Importante para que Flask guarde los cambios
+
+        return jsonify({'success': True, 'new_image_url': nuevo_link})
+    except Exception as e:
+        # En caso de error en BD, podrías querer eliminar la imagen de Imgur? (opcional)
+        return jsonify({'success': False, 'error': 'Error al guardar en la base de datos'}), 500
+    
 @app.route('/perfil')
 def perfil():
     # Obtener datos del usuario desde la sesión
@@ -329,8 +369,6 @@ def registro():
     return render_template('registro.html')
 
 
-
-
 # Apartados de solicitar y reestablecer contraseña
 
 @app.route('/solicitar_recuperacion', methods=['GET', 'POST'])
@@ -361,8 +399,8 @@ def solicitar_recuperacion():
     
     return render_template('solicitar_recuperacion.html')
 
-@app.route('/reestablecer_contrasena', methods=['GET', 'POST'])
-def reestablecer_contrasena():
+@app.route('/restablecer_contrasena', methods=['GET', 'POST'])
+def restablecer_contrasena():
     # Verificar si ya hay datos de usuario en la sesión
     if 'user_data' in session:
         return redirect(url_for('home'))
@@ -377,7 +415,7 @@ def reestablecer_contrasena():
         # verificar si el codigo ingresado y las contraseñas son iguales.
         if codigo_recuperacion != codigo_recuperacion_ingresado or nueva_contrasena != confirmacion_nueva_contrasena:
             session['cambio_contrasena_exitoso'] = False
-            return render_template('reestablecer_contrasena.html')
+            return render_template('restablecer_contrasena.html')
         
         session['cambio_contrasena_exitoso'] = True
 
@@ -386,7 +424,7 @@ def reestablecer_contrasena():
         session['correo_recuperacion_asociado'] = None
         session['correo_valido_resultado'] = None
     
-    return render_template('reestablecer_contrasena.html')
+    return render_template('restablecer_contrasena.html')
 
 @app.route('/chatbot', methods=['GET', 'POST'])
 def chatbot():

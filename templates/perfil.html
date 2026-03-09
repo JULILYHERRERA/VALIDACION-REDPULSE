@@ -32,8 +32,17 @@
             <section class="blood-info">
                 <div class="blood-type">SANGRE: {{ user_data['tipo_de_sangre'] }}</div>
                 <div class="request-now">
-                    <img src="{{ user_data['perfil_imagen_link'] }}" referrerpolicy="no-referrer" alt="Profile Picture" class="profile-picture">
-                    <button onclick="solicitar_donacion_ruta()" class="request-button">Solicitar Sangre</button>
+                <img 
+                    src="{{ user_data['perfil_imagen_link'] }}" 
+                    referrerpolicy="no-referrer" 
+                    alt="Profile Picture" 
+                    class="profile-picture" 
+                    id="profile-pic" 
+                    style="cursor: pointer;" 
+                    title="Haz clic para cambiar tu foto de perfil"
+                >
+                <input type="file" id="file-input" accept="image/*" style="display: none;">
+                <button onclick="solicitar_donacion_ruta()" class="request-button">Solicitar Sangre</button>
                 </div>
             </section>
             <section class="stats">
@@ -65,6 +74,40 @@
         function solicitar_donacion_ruta() {
             window.location.href = 'solicitud_donacion'; // Cambia la URL a la que quieras redirigir
         }
+
+        const profilePic = document.getElementById('profile-pic');
+        const fileInput = document.getElementById('file-input');
+
+        profilePic.addEventListener('click', () => {
+            fileInput.click();
+        });
+
+        fileInput.addEventListener('change', async (event) => {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const formData = new FormData();
+            formData.append('foto', file);
+
+            try {
+            const response = await fetch('/actualizar_foto_perfil', {
+                method: 'POST',
+                body: formData
+            });
+            const result = await response.json();
+
+            if (result.success) {
+                profilePic.src = result.new_image_url;
+                alert('Foto de perfil actualizada correctamente');
+            } else {
+                alert('Error: ' + result.error);
+            }
+            } catch (error) {
+            alert('Error de conexión al actualizar la foto');
+            } finally {
+            fileInput.value = ''; // Permite seleccionar el mismo archivo otra vez
+            }
+        });
     </script>
 
 </body>

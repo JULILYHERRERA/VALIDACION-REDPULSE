@@ -202,3 +202,20 @@ def obtenerCorreosDonantesTipoSangreEspecifico(tipo_sangre):
         return correos_lista
     except Exception as e:
         raise Exception(f"No fue posible obtener los correos para el tipo de sangre {tipo_sangre}") from e
+
+def actualizar_imagen_usuario(numero_documento, tipo_documento, nuevo_link, nuevo_deletehash):
+    """
+    Actualiza el enlace y deletehash de la imagen de perfil de un usuario.
+    """
+    cursor = obtenerCursor()
+    try:
+        sql = """
+            UPDATE usuarios 
+            SET perfil_imagen_link = %s, perfil_imagen_deletehash = %s
+            WHERE numero_documento = %s AND tipo_documento = %s
+        """
+        cursor.execute(sql, (nuevo_link, nuevo_deletehash, numero_documento, tipo_documento))
+        cursor.connection.commit()
+    except Exception as e:
+        cursor.connection.rollback()
+        raise Exception(f"No fue posible actualizar la imagen del usuario {numero_documento}") from e
