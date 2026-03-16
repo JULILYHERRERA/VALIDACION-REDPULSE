@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RedPulse - Convertir Enfermero</title>
+    <link rel="stylesheet" href="/css/stylesConvertirEnfemero.css">
+</head>
+<body>
+    <div class="container">
+        <header class="header">
+            <a class="no-underline" href="{{ url_for('estadisticas') }}">
+                <h1><span class="red">Red</span><span class="pulse">Pulse</span></h1>
+            </a>
+            <nav>
+                <ul>
+                    <li><a href="{{ url_for('estadisticas') }}">Estadisticas</a></li>
+                    <li><a href="{{ url_for('solicitudes_pendientes') }}">Solicitudes de Donación</a></li>
+                    <li><a href="{{ url_for('logout') }}">Cerrar sesión</a></li>
+                </ul>
+            </nav>
+        </header>
+
+        <main class="main-content">
+            <section class="welcome">
+                <h2>Convertir usuario en enfermero</h2>
+            </section>
+
+            <form method="POST">
+                <div class="form-group">
+                    <label for="cedula">Número de documento</label>
+                    <input type="text" id="cedula" name="cedula" placeholder="Ej: 12345678" required>
+                    <select name="tipo_documento" required>
+                        <option value="">Seleccione tipo de documento</option>
+                        <option value="Cedula de Ciudadania">Cédula de Ciudadanía</option>
+                        <option value="Cedula de Extranjeria">Cédula de Extranjería</option>
+                    </select>
+                </div>
+                <button type="submit" class="submit-button">Convertir en enfermero</button>
+            </form>
+        </main>
+    </div>
+
+    <!-- Modal único (como en solicitudes_pendientes) -->
+    <div id="message-popup" class="{% if conversion_status %}active{% endif %}">
+        <div class="popup-content">
+            <h2>
+                {% if conversion_status == 'success' %}¡Éxito!{% elif conversion_status == 'already_nurse' %}Usuario ya es enfermero{% elif conversion_status == 'not_found' %}Usuario no encontrado{% endif %}
+            </h2>
+            <p>
+                {% if conversion_status == 'success' %}
+                    {% if converted_user %}
+                        El usuario <strong>{{ converted_user.nombre }}</strong> ({{ converted_user.tipo_documento }} {{ converted_user.documento }}) ahora es enfermero.
+                    {% else %}
+                        El usuario ha sido convertido a enfermero exitosamente.
+                    {% endif %}
+                {% elif conversion_status == 'already_nurse' %}
+                    {% if converted_user %}
+                        El usuario <strong>{{ converted_user.nombre }}</strong> ({{ converted_user.tipo_documento }} {{ converted_user.documento }}) ya tiene permisos de enfermero.
+                    {% else %}
+                        El usuario ingresado ya es enfermero.
+                    {% endif %}
+                {% elif conversion_status == 'not_found' %}
+                    No existe un usuario con los datos proporcionados.
+                {% endif %}
+            </p>
+            <button onclick="cerrarModal()">Cerrar</button>
+        </div>
+    </div>
+
+    <script>
+        function cerrarModal() {
+            document.getElementById('message-popup').classList.remove('active');
+        }
+
+        // Cerrar al hacer clic fuera del modal
+        window.onclick = function(event) {
+            const modal = document.getElementById('message-popup');
+            if (event.target === modal) {
+                modal.classList.remove('active');
+            }
+        }
+    </script>
+</body>
+</html>

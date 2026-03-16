@@ -170,6 +170,20 @@ def actualizarContrasena(email, nueva_contrasena):
         cursor.connection.rollback()
         raise Exception(f"No fue posible actualizar la contraseña para el usuario con el correo: {email}") from e
 
+def actualizarEstadoEnfermero(numero_documento, tipo_documento, estado):
+    """
+    Actualiza el estado de enfermero de un usuario.
+    estado = True para convertir en enfermero, False para quitar privilegios.
+    """
+    cursor = obtenerCursor()
+    try:
+        sql = "UPDATE usuarios SET enfermero = %s WHERE numero_documento = %s AND tipo_documento = %s"
+        cursor.execute(sql, (estado, numero_documento, tipo_documento))
+        cursor.connection.commit()
+    except Exception as e:
+        cursor.connection.rollback()
+        raise Exception(f"No fue posible actualizar el estado de enfermero para el usuario {numero_documento}") from e
+    
 def obtenerCorreoUsuario(usuario_documento, usuario_tipo_documento):
     cursor = obtenerCursor()
     cursor.execute(

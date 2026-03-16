@@ -233,6 +233,52 @@ def estadisticas():
                            donaciones_por_mes=json.dumps(donaciones_por_mes), 
                            sangre_por_tipo=json.dumps(sangre_por_tipo) )
 
+@app.route('/admin/convertir_enfermero', methods=['GET', 'POST'])
+def convertir_enfermero():
+    # Verificar que el usuario sea administrador
+    user_data = session.get('user_data')
+    if not user_data or not user_data.get('admin'):
+        return redirect(url_for('home'))
+
+    # Procesar el formulario
+    if request.method == 'POST':
+        cedula = request.form.get('cedula')
+        tipo_doc = request.form.get('tipo_documento')
+
+        # Verificar si el usuario existe
+        existe = verificarExistenciaUsuario(cedula, tipo_doc)
+
+        if not existe:
+            session['admin_conversion_status'] = 'not_found'
+        else:
+            usuario = obtenerUsuarioPorDocumento(cedula, tipo_doc)
+            if usuario.enfermero:
+                session['admin_conversion_status'] = 'already_nurse'
+                session['admin_conversion_user'] = {
+                    'nombre': usuario.nombre,
+                    'documento': usuario.numero_documento,
+                    'tipo_documento': usuario.tipo_documento
+                }
+            else:
+                actualizarEstadoEnfermero(cedula, tipo_doc, True)
+                session['admin_conversion_status'] = 'success'
+                session['admin_conversion_user'] = {
+                    'nombre': usuario.nombre,
+                    'documento': usuario.numero_documento,
+                    'tipo_documento': usuario.tipo_documento
+                }
+
+        return redirect(url_for('convertir_enfermero'))
+
+    # GET: recuperar estado y limpiar sesión
+    conversion_status = session.pop('admin_conversion_status', None)
+    converted_user = session.pop('admin_conversion_user', None)
+
+    return render_template('convertir_enfermero.html',
+                           conversion_status=conversion_status,
+                           converted_user=converted_user,
+                           nombre_admin=user_data['nombre'])
+
 # Rutas para el enfermero
 
 @app.route('/enfermero', methods=['GET', 'POST'])
