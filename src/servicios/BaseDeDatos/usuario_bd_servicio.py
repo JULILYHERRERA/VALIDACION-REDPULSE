@@ -110,6 +110,34 @@ def verificarCorreo( correo ):
         return False
     return True
 
+def obtenerTodosUsuariosNoAdmin():
+    """
+    Retorna una lista de diccionarios con todos los usuarios que no son administradores.
+    """
+    cursor = obtenerCursor()
+    cursor.execute("""
+        SELECT nombre, correo, numero_documento, tipo_documento, tipo_de_sangre, 
+               donante, enfermero, puntos, total_donado
+        FROM usuarios
+        WHERE admin = FALSE
+        ORDER BY nombre
+    """)
+    rows = cursor.fetchall()
+    usuarios = []
+    for row in rows:
+        usuarios.append({
+            'nombre': row[0],
+            'correo': row[1],
+            'numero_documento': row[2],
+            'tipo_documento': row[3],
+            'tipo_de_sangre': row[4],
+            'donante': row[5],
+            'enfermero': row[6],
+            'puntos': row[7],
+            'total_donado': row[8]
+        })
+    return usuarios
+
 def obtenerCodigoRecuperacion( correo ):
     """ Busca un usuario por el numero de documento y validamos si existe """
 
@@ -233,3 +261,19 @@ def actualizar_imagen_usuario(numero_documento, tipo_documento, nuevo_link, nuev
     except Exception as e:
         cursor.connection.rollback()
         raise Exception(f"No fue posible actualizar la imagen del usuario {numero_documento}") from e
+    
+def eliminarUsuario(numero_documento, tipo_documento):
+    """
+    Elimina un usuario de la base de datos usando su número y tipo de documento.
+    Lanza excepción si no se encuentra.
+    """
+    cursor = obtenerCursor()
+    try:
+        sql = "DELETE FROM usuarios WHERE numero_documento = %s AND tipo_documento = %s"
+        cursor.execute(sql, (numero_documento, tipo_documento))
+        if cursor.rowcount == 0:
+            raise ErrorNotFound("Usuario no encontrado para eliminar")
+        cursor.connection.commit()
+    except Exception as e:
+        cursor.connection.rollback()
+        raise Exception(f"No fue posible eliminar el usuario {numero_documento}") from e

@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RedPulse - Administrar Usuarios</title>
+    <link rel="stylesheet" href="/css/stylesVisualizarUsuarios.css">
+</head>
+<body>
+    <div class="container">
+        <header class="header">
+            <a class="no-underline" href="{{ url_for('estadisticas') }}">
+                <h1><span class="red">Red</span><span class="pulse">Pulse</span></h1>
+            </a>
+            <nav>
+                <ul>
+                    <li><a href="{{ url_for('estadisticas') }}">Estadisticas</a></li>
+                    <li><a href="{{ url_for('solicitudes_pendientes') }}">Solicitudes de Donación</a></li>
+                    <li><a href="{{ url_for('convertir_enfermero') }}">Convertir Enfermero</a></li>
+                    <li><a href="{{ url_for('logout') }}">Cerrar sesión</a></li>
+                </ul>
+            </nav>
+        </header>
+
+        <main class="main-content">
+            <section class="users-list">
+                <h2>Usuarios (excluyendo administradores)</h2>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Documento</th>
+                            <th>Nombre</th>
+                            <th>Correo</th>
+                            <th>Sangre</th>
+                            <th>Donante</th>
+                            <th>Enfermero</th>
+                            <th>Puntos</th>
+                            <th>Total Donado</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for user in usuarios %}
+                        <tr>
+                            <td>{{ user.tipo_documento }} {{ user.numero_documento }}</td>
+                            <td>{{ user.nombre }}</td>
+                            <td>{{ user.correo }}</td>
+                            <td>{{ user.tipo_de_sangre }}</td>
+                            <td>{% if user.donante %}Sí{% else %}No{% endif %}</td>
+                            <td>{% if user.enfermero %}Sí{% else %}No{% endif %}</td>
+                            <td>{{ user.puntos }}</td>
+                            <td>{{ user.total_donado }} ml</td>
+                            <td>
+                                <form method="POST" action="{{ url_for('visualizar_usuarios') }}" onsubmit="return confirm('¿Está seguro de eliminar a {{ user.nombre }}? Esta acción no se puede deshacer.');">
+                                    <input type="hidden" name="numero_documento" value="{{ user.numero_documento }}">
+                                    <input type="hidden" name="tipo_documento" value="{{ user.tipo_documento }}">
+                                    <button type="submit" class="delete-button">Eliminar</button>
+                                </form>
+                            </td>
+                        </tr>
+                        {% else %}
+                        <tr>
+                            <td colspan="9" style="text-align: center;">No hay usuarios no administradores registrados.</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </section>
+        </main>
+    </div>
+
+    <!-- Modal de mensajes -->
+    <div id="message-popup" class="{% if status %}active{% endif %}">
+        <div class="popup-content">
+            <h2>
+                {% if status == 'success' %}Usuario eliminado{% elif status == 'not_found' %}Usuario no encontrado{% elif status == 'cannot_delete_admin' %}No se puede eliminar un administrador{% elif status == 'error' %}Error al eliminar{% endif %}
+            </h2>
+            <p>
+                {% if status == 'success' and deleted_user %}
+                    El usuario <strong>{{ deleted_user.nombre }}</strong> ({{ deleted_user.tipo_documento }} {{ deleted_user.documento }}) ha sido eliminado.
+                {% elif status == 'success' %}
+                    Usuario eliminado exitosamente.
+                {% elif status == 'not_found' %}
+                    No se encontró el usuario para eliminar. Puede que ya haya sido eliminado.
+                {% elif status == 'cannot_delete_admin' %}
+                    No está permitido eliminar usuarios administradores desde esta interfaz.
+                {% elif status == 'error' %}
+                    Ocurrió un error inesperado. Intente nuevamente.
+                {% endif %}
+            </p>
+            <button onclick="cerrarModal()">Cerrar</button>
+        </div>
+    </div>
+
+    <script>
+        function cerrarModal() {
+            document.getElementById('message-popup').classList.remove('active');
+        }
+
+        window.onclick = function(event) {
+            const modal = document.getElementById('message-popup');
+            if (event.target === modal) {
+                modal.classList.remove('active');
+            }
+        }
+    </script>
+</body>
+</html>

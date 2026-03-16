@@ -233,7 +233,7 @@ def estadisticas():
                            donaciones_por_mes=json.dumps(donaciones_por_mes), 
                            sangre_por_tipo=json.dumps(sangre_por_tipo) )
 
-@app.route('/admin/convertir_enfermero', methods=['GET', 'POST'])
+@app.route('/convertir_enfermero', methods=['GET', 'POST'])
 def convertir_enfermero():
     # Verificar que el usuario sea administrador
     user_data = session.get('user_data')
@@ -278,6 +278,52 @@ def convertir_enfermero():
                            conversion_status=conversion_status,
                            converted_user=converted_user,
                            nombre_admin=user_data['nombre'])
+
+@app.route('/visualizar_usuarios', methods=['GET', 'POST'])
+def visualizar_usuarios():
+    # Verificar que el usuario sea administrador
+    user_data = session.get('user_data')
+    if not user_data or not user_data.get('admin'):
+        return redirect(url_for('home'))
+
+    if request.method == 'POST':
+        # Procesar eliminación
+        numero_documento = request.form.get('numero_documento')
+        tipo_documento = request.form.get('tipo_documento')
+
+        # Verificar que el usuario no sea admin (seguridad extra)
+        try:
+            usuario = obtenerUsuarioPorDocumento(numero_documento, tipo_documento)
+            if usuario.admin:
+                session['admin_usuarios_status'] = 'cannot_delete_admin'
+                return redirect(url_for('visualizar_usuarios'))
+        except ErrorNotFound:
+            session['admin_usuarios_status'] = 'not_found'
+            return redirect(url_for('visualizar_usuarios'))
+
+        # Intentar eliminar
+        try:
+            eliminarUsuario(numero_documento, tipo_documento)
+            session['admin_usuarios_status'] = 'success'
+            session['admin_usuarios_user'] = {
+                'nombre': usuario.nombre,
+                'documento': numero_documento,
+                'tipo_documento': tipo_documento
+            }
+        except Exception:
+            session['admin_usuarios_status'] = 'error'
+
+        return redirect(url_for('visualizar_usuarios'))
+
+    # GET: mostrar lista
+    usuarios = obtenerTodosUsuariosNoAdmin()
+    status = session.pop('admin_usuarios_status', None)
+    deleted_user = session.pop('admin_usuarios_user', None)
+
+    return render_template('visualizar_usuarios.html',
+                           usuarios=usuarios,
+                           status=status,
+                           deleted_user=deleted_user)
 
 # Rutas para el enfermero
 
