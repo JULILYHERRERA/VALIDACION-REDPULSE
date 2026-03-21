@@ -5,35 +5,37 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>RedPulse</title>
     <link rel="stylesheet" href="/css/stylesHome.css">
-    
 </head>
 <body>
 
     <div class="navbar">
         <div class="logo"><span class="red">Red</span><span class="pulse">Pulse</span></div>
-        <ul>
-            <li><a href="{{ url_for('nosotros') }}">Nosotros</a></li>
-            <li><a href="{{ url_for('informacion_preparativos') }}">Preparativos Donación</a></li>
-            {% if user_data %}
-            <li><a href="{{ url_for('solicitud_donacion') }}">Solicitar Sangre</a></li>
-            {% endif %}
-            {% if user_data %}
-                {% if user_data.get('admin') or user_data.get('enfermero') %}
-                    <!-- Admin y enfermero no usan chatbot -->
-                {% elif user_data.get('donante') %}
-                    <li><a href="{{ url_for('chatbot_donante') }}">ChatBot</a></li>
-                {% else %}
-                    <li><a href="{{ url_for('chatbot_solicitante') }}">ChatBot</a></li>
-                {% endif %}
-        {% else %}
-            <!-- Si no hay sesión, lo puedes mandar al login o no mostrarlo -->
-            <li><a href="{{ url_for('login') }}"></a></li>
-        {% endif %}
         
-        </ul>
-        <!-- Verificamos si el usuario ya se registro o inicio sesion, para... -->
-        <!-- Eliminar el boton registrar y cambiar el nombre y direccion de Login a Perfil-->
+        <ul>
+    <li><a href="{{ url_for('nosotros') }}">Nosotros</a></li>
+    <li><a href="{{ url_for('informacion_preparativos') }}">Preparativos Donación</a></li>
 
+    {% if user_data %}
+        
+        <li><a href="{{ url_for('solicitud_donacion') }}">Solicitar Sangre</a></li>
+
+        <!-- 🔔 SOLO DONANTES -->
+        {% if user_data.get('donante') %}
+            <li><a href="/notificaciones">🔔 Notificaciones</a></li>
+        {% endif %}
+
+        {% if not (user_data.get('admin') or user_data.get('enfermero')) %}
+            {% if user_data.get('donante') %}
+                <li><a href="{{ url_for('chatbot_donante') }}">ChatBot</a></li>
+            {% else %}
+                <li><a href="{{ url_for('chatbot_solicitante') }}">ChatBot</a></li>
+            {% endif %}
+        {% endif %}
+
+    {% endif %}
+</ul>
+
+        <!-- Botón Perfil/Login -->
         {% if user_data %}
             <a href="{{ url_for('perfil') }}">
                 <button class="login-button">Perfil</button>
@@ -43,7 +45,6 @@
                 <button class="login-button">Login</button>
             </a>
         {% endif %}
-
     </div>
 
     <div class="hero">
@@ -53,28 +54,26 @@
         <div class="save-lives-box">
             <h3>¡Salva vidas hoy!</h3>
             <p>Tu contribución es vital para aquellos que lo necesitan. Cada gota cuenta, y tú puedes marcar la diferencia.</p>
+
             {% if not user_data %}
             <a href="{{ url_for('registro') }}">
                 <button class="register-button">Regístrate</button>
             </a>
             {% endif %}
-          </div>
+        </div>
 
-        <img src="https://static.vecteezy.com/system/resources/thumbnails/009/386/358/small/3d-rendering-of-hand-holding-blod-drop-concept-of-blood-organ-donation-png.png" alt="RedPulse Image">
+        <img src="https://static.vecteezy.com/system/resources/thumbnails/009/386/358/small/3d-rendering-of-hand-holding-blod-drop-concept-of-blood-organ-donation-png.png">
     </div>
-
 
     <div class="features">
         <div class="feature-box">
             <h2>Gana Puntos y Canjéalos</h2>
-            <p>Al donar recibiras puntos para redimir en nuestras tiendas asociadas</p>
+            <p>Al donar recibirás puntos para redimir en nuestras tiendas asociadas</p>
         </div>
         <div class="feature-box">
             <h2>Sé un héroe</h2>
             <p>Se te mantendrá informado de convocatorias que involucran tu tipo de sangre.</p>
         </div>
     </div>
-
-
 </body>
 </html>

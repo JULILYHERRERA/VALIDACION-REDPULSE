@@ -8,6 +8,7 @@ from servicios.BaseDeDatos.registro_bd_servicio import *
 
 #email
 from servicios.notificaciones_servicio import *
+from servicios.notificaciones_servicio import Notificaciones
 email = Notificaciones()
 
 CNT_SANGRE_MINIMA = 1000
@@ -18,11 +19,12 @@ def verificarNivelesDeSangre(solicitud_id, accion, tipo_sangre_solicitud):
     email.solicitud_notificacion(correo_usuario, accion)
 
     cnt_sangre_solicitud = obtenerCantidadSangreDonada(tipo_sangre_solicitud)
-
+    
     if cnt_sangre_solicitud < CNT_SANGRE_MINIMA and accion == 'Aprobado':
+        mensaje = f"Hay escasez de sangre {tipo_sangre_solicitud}. Revisar su correo para más detalles."
         correos_usuario = obtenerCorreosDonantesTipoSangreEspecifico(tipo_sangre_solicitud)
 
         for correo in correos_usuario:
             email.parametros_notificacion_donante(correo, tipo_sangre_solicitud)
-
+            agregar_notificacion(correo,mensaje)
         email.parametros_notificacion_admin(tipo_sangre_solicitud)

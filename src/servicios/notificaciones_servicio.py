@@ -4,10 +4,27 @@ import smtplib
 from secret_config import NOTIEMAIL, NOTI_APPCONTRA, ADMINEMAIL
 
 
+# 🧠 almacenamiento en memoria
+notificaciones_data = {}
+
+
+# 🔔 FUNCIÓN PARA GUARDAR NOTIFICACIONES
+def agregar_notificacion(correo, mensaje):
+    if correo not in notificaciones_data:
+        notificaciones_data[correo] = []
+    
+    notificaciones_data[correo].append(mensaje)
+
+
+# 🔔 FUNCIÓN PARA CONSULTAR NOTIFICACIONES
+def obtener_notificaciones(correo):
+    return notificaciones_data.get(correo, [])
+
+
 class Notificaciones:
-    def __init__(self,de_email=None, contra=None, admin_email=ADMINEMAIL):
+    def __init__(self, de_email=None, contra=None, admin_email=ADMINEMAIL):
         self.admin_email = admin_email
-        if None in [de_email]:
+        if de_email is None:
             self.de_email = NOTIEMAIL
             self.contra = NOTI_APPCONTRA
         else:
@@ -29,54 +46,56 @@ class Notificaciones:
         
         server.sendmail(msj['From'], msj['To'], msj.as_string())
         server.quit()
-    
-    def parametros_notificacion_donante(self, para_email, tipo_sangre):
-            asunto = "¡Tu ayuda es crucial! Necesitamos que te acerques a nuestro centro de donacion!"
-            mensaje = (
-                f"Espero que estés bien. Nos gustaría informarte sobre una importante accion que se llevará a cabo. "
-                f"Necesitamos de tu presencia en nuestro centro de donación ya que es una situación crítica porque estamos en necesidad urgente de sangre de tipo {tipo_sangre}. "
-                f"Como donante valioso, tu participación puede marcar la diferencia en la vida de muchos pacientes que dependen de transfusiones. "
-                f"La donación es rápida y segura, y cada gota cuenta, gracias."
-            )
-            self.enviar_notificacion(para_email, asunto, mensaje)
 
+
+    # 🔔 DONANTE
+    def parametros_notificacion_donante(self, para_email, tipo_sangre):
+        asunto = "¡Tu ayuda es crucial!"
+
+        mensaje = (
+            f"Necesitamos tu ayuda. Sangre tipo {tipo_sangre}."
+        )
+
+        mensaje_corto = f"Escasez de sangre tipo {tipo_sangre}. ¡Dona ahora!"
+
+        # ✅ GUARDAR NOTIFICACIÓN (CLAVE)
+        agregar_notificacion(para_email, mensaje_corto)
+
+        # 📧 ENVIAR CORREO
+        self.enviar_notificacion(para_email, asunto, mensaje)
+
+
+    # 🔔 ADMIN
     def parametros_notificacion_admin(self, tipo_sangre):
         asunto = f"Niveles de sangre {tipo_sangre} bajos"
         mensaje = (
-            f"Los niveles actuales de la sangre de tipo {tipo_sangre} se encuentran por debajo de lo recomendado, "
-            "se le ha notificado a todos los donantes con ese tipo de sangre especifico, es recomendable tomar medidas para retomar niveles seguros de sangre."
+            f"Los niveles de sangre tipo {tipo_sangre} están bajos."
         )
         self.enviar_notificacion(self.admin_email, asunto, mensaje)
 
+
     def recuperar_contra_notificacion(self, para_email, codigo):
-        codigo_recuperacion = f"Tu código de confirmación es: {codigo}" #cambiar cuando tengamos el deploy
         asunto = "Recuperación de Contraseña"
         mensaje = (
-            f"Has solicitado restablecer tu contraseña. Para continuar, copia y pega en nuestra pagina web el siguiente codigo:\n\n"
-            f"{codigo_recuperacion}\n\n"
-            "Con este codigo puedes restaurar tu contraseña. Si no solicitaste este cambio, puedes ignorar este mensaje."
+            f"Tu código de recuperación es:\n\n{codigo}"
         )
         self.enviar_notificacion(para_email, asunto, mensaje)
 
-         
+
     def solicitud_notificacion(self, para_email, estado):
-        asunto = ""
-        if(estado == "Aprobado"):
-            asunto = "Solicitud de sangre aprobada"
-            res = "aprobada. Puede reclamarla en nuestro punto oficial de atención o, si lo prefiere, comuníquese con nosotros para obtener más detalles."
+        if estado == "Aprobado":
+            asunto = "Solicitud aprobada"
+            mensaje = "Tu solicitud fue aprobada."
         else:
-            asunto = "Solicitud de sangre denegada"
-            res = "denegada. Si desea obtener información adicional, no dude en ponerse en contacto con nosotros."
-        mensaje = "Su solicitud ha sido " + res
+            asunto = "Solicitud rechazada"
+            mensaje = "Tu solicitud fue rechazada."
+
         self.enviar_notificacion(para_email, asunto, mensaje)
+
 
     def redimir_puntos_notificacion(self, para_email, codigo):
         asunto = "Redención de puntos"
         mensaje = (
-                    "Gracias por redimir sus puntos en nuestro sistema de recompensas. "
-                    "Su solicitud ha sido procesada con éxito, y a continuación le proporcionamos su código de bono:\n\n"
-                    f"Código de Bono: {codigo}\n\n"
-                    "Puede utilizar este código para disfrutar de su recompensa. "
-                    "Si necesita asistencia adicional o tiene alguna pregunta, estamos aquí para ayudarle."
-                    )
+            f"Has redimido tus puntos.\n\nCódigo: {codigo}"
+        )
         self.enviar_notificacion(para_email, asunto, mensaje)

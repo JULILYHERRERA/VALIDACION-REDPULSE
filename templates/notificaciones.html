@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Notificaciones</title>
+
+    <link rel="stylesheet" href="/css/stylesNotificaciones.css">
+</head>
+<body>
+
+    <div class="contenedor">
+    <h2>🔔 Notificaciones</h2>
+
+    <div id="lista-notificaciones"></div>
+
+    <a href="/">Volver al inicio</a>
+</div>
+    <script>
+    const lista = document.getElementById("lista-notificaciones");
+    const correo = "{{ user_data['correo'] }}";
+    fetch(`/notificaciones/${correo}`)
+    .then(res => res.json())
+    .then(data => {
+        if (data.length === 0) {
+            lista.innerHTML = "<p>No tienes notificaciones</p>";
+        } else {
+            data.forEach(m => {
+                lista.innerHTML += "<p>" + m + "</p>";
+        });
+    }
+});
+</script>
+
+</body>
+</html>

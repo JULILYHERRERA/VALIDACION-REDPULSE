@@ -28,10 +28,8 @@ from servicios.sesion_servicio import *
 
 # Importar el servicio de donaciones.
 from servicios.registro_servicio import *
+from servicios.notificaciones_servicio import obtener_notificaciones
 
-#email
-from servicios.notificaciones_servicio import *
-email = Notificaciones()
 
 # app principal del Flask
 app = Flask(__name__,
@@ -49,6 +47,23 @@ imgur_handler = Imgur(app)
 #////////////////////////////// Rutas //////////////////////////////////////////////
 
 # Home, Logout y retorno al home
+@app.route("/notificaciones")
+def pagina_notificaciones():
+    user_data = session.get("user_data")
+
+    if not user_data:
+        return redirect(url_for("login"))
+
+    if not user_data.get("donante"):
+        return redirect(url_for("home"))
+
+    return render_template("notificaciones.html", user_data=user_data)
+
+
+
+@app.route("/notificaciones/<correo>")
+def ver_notificaciones(correo):
+    return jsonify(obtener_notificaciones(correo))
 
 @app.route('/')
 def home():
