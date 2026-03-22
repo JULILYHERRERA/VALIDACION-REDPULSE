@@ -165,3 +165,31 @@ h2 {
 #message-popup.active {
     display: flex;
 }
+
+.acciones-superiores {
+    margin: 15px 0 20px 0;
+    display: flex;
+    justify-content: flex-start;
+}
+
+.filter-button {
+    display: inline-block;
+    padding: 10px 16px;
+    background-color: #b71c1c;
+    color: white;
+    text-decoration: none;
+    border-radius: 8px;
+    font-weight: bold;
+    transition: 0.3s;
+}
+
+.filter-button:hover {
+    background-color: #8f1515;
+}
+
+.mensaje-vacio {
+    margin-top: 20px;
+    font-size: 18px;
+    color: #b71c1c;
+    font-weight: bold;
+}

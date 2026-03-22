@@ -277,3 +277,42 @@ def eliminarUsuario(numero_documento, tipo_documento):
     except Exception as e:
         cursor.connection.rollback()
         raise Exception(f"No fue posible eliminar el usuario {numero_documento}") from e
+    
+
+
+def obtenerSolicitudesPendientesPorTipo(tipo_sangre):
+    """ Obtiene solicitudes pendientes filtradas por tipo de sangre """
+    cursor = obtenerCursor()
+    
+    cursor.execute("""
+    SELECT u.nombre AS nombre_donante, 
+           r.tipo_sangre, 
+           r.cantidad, 
+           r.fecha, 
+           r.razon, 
+           r.prioridad,
+           r.id
+    FROM REGISTROS r
+    JOIN USUARIOS u 
+    ON r.usuario_documento = u.numero_documento 
+       AND r.usuario_tipo_documento = u.tipo_documento
+    WHERE r.estado = 'Pendiente' AND r.tipo_sangre = %s;
+    """, (tipo_sangre,))
+    
+    registros = cursor.fetchall()
+
+    solicitudes = []
+    for registro in registros:
+        solicitud = {
+            "nombreDonante": registro[0],
+            "tipoSangre": registro[1],
+            "cantidad": registro[2],
+            "fecha": registro[3].strftime("%d-%m-%Y"),
+            "razon": registro[4],
+            "prioridad": registro[5],
+            "id": registro[6],
+        }
+        solicitudes.append(solicitud)
+
+    return solicitudes
+

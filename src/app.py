@@ -574,6 +574,20 @@ def chatbot_solicitante():
     return jsonify(respuesta=respuesta)
 
 
+@app.route('/filtrar_solicitudes', methods=['GET', 'POST'])
+def filtrar_solicitudes():
+    solicitudes_filtradas = []
+
+    if request.method == 'POST':
+        tipo_sangre = request.form.get('tipo_sangre')
+        solicitudes_filtradas = obtenerSolicitudesPendientesPorTipo(tipo_sangre)
+
+    return render_template(
+        'filtrar_solicitudes.html',
+        solicitudes_filtradas=solicitudes_filtradas
+    )
+
+
 
 if __name__ == '__main__':
     app.run(host="0.0.0.0", port=5000) # debug=True --> cuando se use localmente
