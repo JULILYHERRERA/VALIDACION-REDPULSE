@@ -35,8 +35,9 @@
                 
                 <label for="donation-date">Fecha de la Donación</label>
                 <input type="date" name="fecha_donacion" id="donation-date" required>
-
-                <button type="submit">Registrar Donación</button>
+                <button type="submit" formaction="{{ url_for('asignar_puntos') }}" formmethod="GET" class="btn-puntos">
+                    Asignación de Puntos
+                </button>
             </form>
         </main>
     </div>

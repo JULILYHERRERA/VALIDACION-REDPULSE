@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Asignar Puntos</title>
+    <link rel="stylesheet" href="/css/stylesAsignarPuntos.css">
+</head>
+<body>
+
+<div class="container">
+    <div class="card">
+        <h2>Asignación de Puntos</h2>
+
+        <form method="POST" class="form-puntos">
+            <label>Cantidad de puntos</label>
+            <input type="number" name="puntos" required min="0">
+
+            <button type="submit">Asignar</button>
+        </form>
+
+        <a href="{{ url_for('enfermero') }}" class="volver">Volver</a>
+    </div>
+</div>
+
+</body>
+</html>

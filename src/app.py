@@ -186,6 +186,35 @@ def puntos():
 
     return render_template('puntos.html', user_data=user_data)
 
+@app.route('/asignar_puntos', methods=['GET', 'POST'])
+def asignar_puntos():
+    user_data = session.get('user_data')
+
+    if not user_data or not user_data.get('enfermero'):
+        return redirect(url_for('home'))
+
+    user_obtained_data = session.get('enfermero_usuario_obtenido')
+
+    if request.method == 'POST':
+        puntos = request.form.get('puntos')
+
+        if not puntos:
+            return render_template('asignar_puntos.html')
+
+        puntos = int(puntos)
+
+        numero_documento = user_obtained_data['cedula_usuario']
+        tipo_documento = user_obtained_data['tipo_cedula_usuario']
+
+        usuario = obtenerUsuarioPorDocumento(numero_documento, tipo_documento)
+
+        nuevos_puntos = usuario.puntos + puntos
+
+        actualizarPuntos(numero_documento, tipo_documento, nuevos_puntos)
+
+        return redirect(url_for('enfermero'))
+
+    return render_template('asignar_puntos.html')
 
 @app.route('/solicitud_donacion', methods=['GET', 'POST'])
 def solicitud_donacion():

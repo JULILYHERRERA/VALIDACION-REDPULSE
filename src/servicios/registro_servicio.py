@@ -32,7 +32,7 @@ def insertarDonacion(numero_documento, tipo_documento, fecha, cantidad_donada, t
         
         insertarRegistro(nuevo_registro)
         
-        actualizarPuntos(numero_documento, tipo_documento, usuario.puntos + 2000)
+
         actualizarCantidadDonada(numero_documento, tipo_documento, usuario.total_donado + cantidad_donada)
 
         return True

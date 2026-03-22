@@ -1,0 +1,83 @@
+@import url('https://fonts.googleapis.com/css2?family=Quicksand:wght@400;600&display=swap');
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    font-family: 'Quicksand', sans-serif;
+}
+
+body {
+    background-color: #f2f4f8;
+    color: #333;
+}
+
+.container {
+    max-width: 600px;
+    margin: 80px auto;
+    padding: 20px;
+}
+
+/* Tarjeta principal */
+.card {
+    background-color: #ffffff;
+    padding: 30px;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+/* Título */
+.card h2 {
+    text-align: center;
+    color: #B93A32;
+    margin-bottom: 20px;
+}
+
+/* Formulario */
+.form-puntos {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.form-puntos label {
+    font-size: 16px;
+    font-weight: 600;
+}
+
+.form-puntos input {
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    font-size: 16px;
+}
+
+/* Botón principal */
+.form-puntos button {
+    background-color: #B93A32;
+    color: white;
+    border: none;
+    padding: 12px;
+    border-radius: 6px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+.form-puntos button:hover {
+    background-color: #A3312D;
+}
+
+/* Botón volver */
+.volver {
+    display: block;
+    text-align: center;
+    margin-top: 15px;
+    text-decoration: none;
+    color: #555;
+    font-weight: bold;
+}
+
+.volver:hover {
+    color: #B93A32;
+}
