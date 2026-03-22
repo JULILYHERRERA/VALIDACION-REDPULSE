@@ -91,8 +91,7 @@ def test_chatbot_solicitante_post_genera_respuesta(client, monkeypatch):
 # -----------------------------
 def test_chatbot_solicitante_sin_sesion_explota(client):
     # No seteamos session["user_data"]
-
-    resp = client.get("/chatbot_solicitante")
-
-    # Esperamos que falle con error 500
-    assert resp.status_code == 500
+    resp = client.get("/chatbot_solicitante", follow_redirects=False)
+    # Ahora debe redirigir a login
+    assert resp.status_code == 302
+    assert "/login" in resp.headers.get("Location", "")

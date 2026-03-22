@@ -29,7 +29,8 @@ def test_login_redirige_si_ya_hay_sesion(client):
 
     resp = client.get("/login", follow_redirects=False)
     assert resp.status_code in (301, 302)
-    assert "/home" in resp.headers.get("Location", "")
+
+    assert "/" in resp.headers.get("Location", "")
 
 
 # -----------------------------

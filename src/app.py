@@ -187,7 +187,6 @@ def puntos():
     return render_template('puntos.html', user_data=user_data)
 
 
-
 @app.route('/solicitud_donacion', methods=['GET', 'POST'])
 def solicitud_donacion():
     # Obtener datos del usuario desde la sesión
@@ -560,6 +559,10 @@ def chatbot_donante():
 @app.route('/chatbot_solicitante', methods=['GET', 'POST'])
 def chatbot_solicitante():
     user_data = session.get('user_data')
+
+    # Si no hay usuario autenticado, redirigir al login
+    if not user_data:
+        return redirect(url_for('login'))
 
     # Solo solicitante entra
     if user_data.get('donante') == True:
