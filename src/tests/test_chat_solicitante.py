@@ -2,9 +2,9 @@ import pytest
 import sys
 import os
 
-# agrega la carpeta src al path (igual que tus pruebas)
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 
+import app as modulo
 from app import app
 
 
@@ -16,82 +16,135 @@ def client():
         yield client
 
 
-# -----------------------------
-# PRUEBA 1 (Camino 1):
-# Usuario NO es solicitante (es donante) -> redirige a chatbot_donante
-# Secuencia esperada: 1-2-3-9
-# -----------------------------
-def test_chatbot_solicitante_redirige_si_es_donante(client):
+# =====================================================
+# PRUEBA 1 – Sin sesión redirige a login
+# =====================================================
+def test_prueba1_sin_sesion_redirige_a_login(client):
+    # ARRANGE
+
+    # ACT
+    resp = client.get("/chatbot_solicitante", follow_redirects=False)
+
+    # ASSERT
+    assert resp.status_code in (301, 302)
+    assert "/login" in resp.headers.get("Location", "")
+
+
+# =====================================================
+# PRUEBA 2 – Donante redirige a chatbot_donante
+# =====================================================
+def test_prueba2_donante_redirige_a_chatbot_donante(client):
+    # ARRANGE
     with client.session_transaction() as sess:
         sess["user_data"] = {"donante": True}
 
+    # ACT
     resp = client.get("/chatbot_solicitante", follow_redirects=False)
 
+    # ASSERT
     assert resp.status_code in (301, 302)
-    # No asumimos el path exacto, pero sí que redirige
     assert resp.headers.get("Location") is not None
-    # Si quieres hacerlo más específico:
-    # assert "chatbot_donante" in resp.headers.get("Location", "")
 
 
-# -----------------------------
-# PRUEBA 2 (Camino 2):
-# Usuario solicitante y solo abre el chat (GET) -> renderiza chatbot.html
-# Secuencia: 1-2-3-4-5-9
-# -----------------------------
-def test_chatbot_solicitante_get_renderiza_chat(client):
+# =====================================================
+# PRUEBA 3 – GET de solicitante renderiza chat
+# STUB
+# =====================================================
+def test_prueba3_get_solicitante_renderiza_chat(client, monkeypatch):
+    # ARRANGE
+    contexto = {}
+
+    def fake_render(template_name, **kwargs):
+        contexto["template"] = template_name
+        contexto["user_data"] = kwargs.get("user_data")
+        contexto["rol_chat"] = kwargs.get("rol_chat")
+        return "render ok"
+
+    monkeypatch.setattr(modulo, "render_template", fake_render)
+
     with client.session_transaction() as sess:
         sess["user_data"] = {"donante": False, "nombre": "Juliana"}
 
+    # ACT
     resp = client.get("/chatbot_solicitante")
 
+    # ASSERT
     assert resp.status_code == 200
-    # Validación suave: que retorne HTML
-    assert b"html" in resp.data.lower() or b"chat" in resp.data.lower()
+    assert contexto["template"] == "chatbot.html"
+    assert contexto["rol_chat"] == "SOLICITANTE"
+    assert contexto["user_data"]["nombre"] == "Juliana"
 
 
-# -----------------------------
-# PRUEBA 3 (Camino 3):
-# Usuario solicitante envía mensaje (POST JSON) -> devuelve respuesta generada
-# Secuencia: 1-2-3-4-6-7-8-9
-# -----------------------------
-def test_chatbot_solicitante_post_genera_respuesta(client, monkeypatch):
-    import app as modulo
+# =====================================================
+# PRUEBA 4 – POST válido genera respuesta
+# STUB + SPY
+# =====================================================
+def test_prueba4_post_valido_genera_respuesta(client, monkeypatch):
+    # ARRANGE
+    llamadas = []
+
+    def fake_generate_response(mensaje, user_data, rol_forzado=None):
+        llamadas.append((mensaje, user_data, rol_forzado))
+        return "RESPUESTA_MOCK"
+
+    monkeypatch.setattr(modulo, "generate_response", fake_generate_response)
 
     with client.session_transaction() as sess:
         sess["user_data"] = {"donante": False, "nombre": "Juliana"}
 
-    # Mock de generate_response para que sea unitario y no llame IA real
-    def mock_generate_response(mensaje, user_data, rol_forzado=None):
-        return f"RESPUESTA_MOCK: {mensaje} | rol={rol_forzado}"
-
-    monkeypatch.setattr(modulo, "generate_response", mock_generate_response)
-
+    # ACT
     resp = client.post(
         "/chatbot_solicitante",
-        json={"mensaje_ingresado": "Hola"},
+        json={"mensaje_ingresado": "Hola"}
     )
 
+    # ASSERT
     assert resp.status_code == 200
-    data = resp.get_json()
-    assert "respuesta" in data
-    assert "RESPUESTA_MOCK: Hola" in data["respuesta"]
-    assert "rol=SOLICITANTE" in data["respuesta"]
+    assert resp.is_json
+    assert llamadas[0][0] == "Hola"
+    assert llamadas[0][2] == "SOLICITANTE"
+    assert resp.get_json() == {"respuesta": "RESPUESTA_MOCK"}
 
 
+# =====================================================
+# PRUEBA 5 – POST sin JSON debería manejarse
+# FALLA
+# =====================================================
+def test_prueba5_post_sin_json_deberia_manejarse(client):
+    # ARRANGE
+    with client.session_transaction() as sess:
+        sess["user_data"] = {"donante": False, "nombre": "Juliana"}
+
+    # ACT
+    resp = client.post("/chatbot_solicitante")
+
+    # ASSERT
+    assert resp.status_code == 200
 
 
-# Test de roburtez para verificar un bug real en el codigo
-# sabemos que para verificar el usuario es solciitante , mira di donante es == True 
-# pero si es None?
+# =====================================================
+# PRUEBA 6 – POST sin mensaje no debería procesarse
+# SPY (FALLA)
+# =====================================================
+def test_prueba6_post_sin_mensaje_no_deberia_procesarse(client, monkeypatch):
+    # ARRANGE
+    llamadas = []
 
-# -----------------------------
-# PRUEBA EXTRA DE ROBUSTEZ:
-# Si no hay user_data en sesión, el endpoint explota
-# -----------------------------
-def test_chatbot_solicitante_sin_sesion_explota(client):
-    # No seteamos session["user_data"]
-    resp = client.get("/chatbot_solicitante", follow_redirects=False)
-    # Ahora debe redirigir a login
-    assert resp.status_code == 302
-    assert "/login" in resp.headers.get("Location", "")
+    def fake_generate_response(mensaje, user_data, rol_forzado=None):
+        llamadas.append((mensaje, user_data, rol_forzado))
+        return "RESPUESTA_MOCK"
+
+    monkeypatch.setattr(modulo, "generate_response", fake_generate_response)
+
+    with client.session_transaction() as sess:
+        sess["user_data"] = {"donante": False, "nombre": "Juliana"}
+
+    # ACT
+    resp = client.post(
+        "/chatbot_solicitante",
+        json={}
+    )
+
+    # ASSERT
+    assert resp.status_code == 200
+    assert llamadas == []
