@@ -10,11 +10,11 @@ from flask import session
 #Misc
 import secrets
 
-#email
-from servicios.notificaciones_servicio import *
+# email
+from servicios.notificaciones_servicio import Notificaciones
 email = Notificaciones()
 
-def procesarPuntos(puntos_seleccionados: int):
+def procesar_puntos(puntos_seleccionados: int):
     # Obtener datos y actualizar en la session y base de datos
     user_data = session.get('user_data')
     puntos_usuario = user_data['puntos']

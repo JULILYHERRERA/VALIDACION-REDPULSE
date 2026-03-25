@@ -194,7 +194,7 @@ def puntos():
         data = request.get_json()  # Obtener los datos JSON enviados
         puntos_seleccionados = int(data.get('puntos_seleccionados'))  # Acceder a los puntos seleccionados especificamente
 
-        puntos_procesados = procesarPuntos(puntos_seleccionados)
+        puntos_procesados = procesar_puntos(puntos_seleccionados)
         
         return jsonify(success=puntos_procesados, nuevos_puntos=obtenerValorUsuarioSesion('puntos'))
 
