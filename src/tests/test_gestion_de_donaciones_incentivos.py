@@ -242,3 +242,4 @@ def test_prueba10_campos_vacios_no_deberian_consultar_existencia(client, monkeyp
     # ASSERT
     assert resp.status_code == 200
     assert llamadas == []
+
