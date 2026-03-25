@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>RedPulse - Mis Puntos</title>
@@ -110,11 +111,14 @@
           // Crear un objeto con los datos a enviar
           const data = { puntos_seleccionados: puntos };
   
+          const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+
           // Hacer la petición POST
           fetch('/puntos', {
               method: 'POST',
               headers: {
-                  'Content-Type': 'application/json',
+                'Content-Type': 'application/json',
+                'X-CSRFToken': csrfToken
               },
               body: JSON.stringify(data)
           })

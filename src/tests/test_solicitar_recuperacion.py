@@ -7,15 +7,6 @@ sys.path.append(os.path.join(PROJECT_ROOT, "src"))
 
 from app import app
 
-
-@pytest.fixture
-def client():
-    app.config["TESTING"] = True
-    app.config["SECRET_KEY"] = "test-secret"
-    with app.test_client() as client:
-        yield client
-
-
 def test_get_renderiza_vista(client):
     """Prueba GET: renderiza página. Uso de Dummy."""
     # Arrange
@@ -27,7 +18,6 @@ def test_get_renderiza_vista(client):
     # Assert
     assert resp.status_code == 200
     assert dummy is None
-
 
 def test_redirige_si_ya_hay_sesion(client):
     """Prueba: si hay sesión activa, redirige a home. Uso de Dummy."""
@@ -43,7 +33,6 @@ def test_redirige_si_ya_hay_sesion(client):
     assert resp.status_code in (301, 302)
     assert dummy is not None
 
-
 def test_post_correo_no_registrado(client, monkeypatch):
     """POST con correo no registrado. Stub + Dummy."""
     # Arrange
@@ -58,7 +47,6 @@ def test_post_correo_no_registrado(client, monkeypatch):
     with client.session_transaction() as sess:
         assert sess["correo_valido_resultado"] is False
     assert dummy is not None
-
 
 def test_post_correo_registrado_envia_codigo(client, monkeypatch):
     """POST con correo registrado. Stubs + Spy."""
@@ -86,7 +74,6 @@ def test_post_correo_registrado_envia_codigo(client, monkeypatch):
         assert sess["correo_recuperacion_asociado"] == correo
     assert llamadas["count"] == 1
     assert llamadas["args"] == (correo, "ABC123")
-
 
 def test_post_correo_registrado_error_email(client, monkeypatch):
     """POST con correo registrado pero fallo al enviar email. Stub que lanza excepción."""

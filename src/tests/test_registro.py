@@ -6,13 +6,6 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 
 from app import app
 
-@pytest.fixture
-def client():
-    app.config["TESTING"] = True
-    app.config["SECRET_KEY"] = "test-secret"
-    with app.test_client() as client:
-        yield client
-
 # =====================================================
 # PRUEBA 1 – Redirige si ya hay sesión
 # =====================================================
@@ -28,7 +21,6 @@ def test_prueba1_redirige_si_ya_hay_sesion(client):
     assert resp.status_code in (301, 302)
     assert resp.headers.get("Location") is not None
 
-
 # =====================================================
 # PRUEBA 2 – GET renderiza registro (Sin sesión)
 # =====================================================
@@ -42,7 +34,6 @@ def test_prueba2_get_renderiza_registro(client):
 
     # ASSERT
     assert resp.status_code == 200
-
 
 # =====================================================
 # PRUEBA 3 – Usuario ya existe -> STUB
@@ -79,7 +70,6 @@ def test_prueba3_usuario_ya_existente(client, monkeypatch):
         assert sess.get("registarse_verificacion_resultado") is True
         assert "user_data" not in sess
 
-
 # =====================================================
 # PRUEBA 4 – Correo ya existe -> STUB
 # =====================================================
@@ -113,7 +103,6 @@ def test_prueba4_correo_ya_existente(client, monkeypatch):
     with client.session_transaction() as sess:
         assert sess.get("registarse_verificacion_resultado") is True
         assert "user_data" not in sess
-
 
 # =====================================================
 # PRUEBA 5 – Registro exitoso -> MOCK + STUB

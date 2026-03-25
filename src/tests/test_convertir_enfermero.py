@@ -7,15 +7,6 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 
 from app import app
 
-
-@pytest.fixture
-def client():
-    app.config["TESTING"] = True
-    app.config["SECRET_KEY"] = "test-secret"
-    with app.test_client() as client:
-        yield client
-
-
 def test_convertir_enfermero_happy_path(client, monkeypatch):
     """Prueba exitosa. Stubs y Spy para actualizarEstadoEnfermero."""
     # Stubs
@@ -48,7 +39,6 @@ def test_convertir_enfermero_happy_path(client, monkeypatch):
     assert len(call_args) == 1
     assert call_args[0] == ("123", "Cedula de Ciudadania", True)
 
-
 def test_convertir_enfermero_usuario_no_existe(client, monkeypatch):
     """Prueba unhappy: usuario no existe. Stub y Dummy."""
     # Stub
@@ -69,7 +59,6 @@ def test_convertir_enfermero_usuario_no_existe(client, monkeypatch):
         assert sess["admin_conversion_status"] == "not_found"
     assert dummy is not None
 
-
 def test_convertir_enfermero_ya_es_enfermero(client, monkeypatch):
     """Prueba unhappy: usuario ya es enfermero. Stub."""
     monkeypatch.setattr("app.verificarExistenciaUsuario", lambda ced, tip: True)
@@ -88,7 +77,6 @@ def test_convertir_enfermero_ya_es_enfermero(client, monkeypatch):
     with client.session_transaction() as sess:
         assert sess["admin_conversion_status"] == "already_nurse"
 
-
 def test_convertir_enfermero_get_con_estado(client):
     """Prueba GET: renderiza template y limpia sesión. Uso de Dummy."""
     # Dummy
@@ -106,7 +94,6 @@ def test_convertir_enfermero_get_con_estado(client):
         assert "admin_conversion_status" not in sess
         assert "admin_conversion_user" not in sess
     assert dummy is None  # dummy no usado
-
 
 def test_convertir_enfermero_no_admin(client):
     """Prueba unhappy: usuario no administrador -> redirige a home. Dummy."""

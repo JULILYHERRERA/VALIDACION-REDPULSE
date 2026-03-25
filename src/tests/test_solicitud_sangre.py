@@ -8,15 +8,6 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 import app as modulo
 from app import app
 
-
-@pytest.fixture
-def client():
-    app.config["TESTING"] = True
-    app.config["SECRET_KEY"] = "test-secret"
-    with app.test_client() as client:
-        yield client
-
-
 def _user_data_solicitante(registros=None):
     return {
         "nombre": "Laura",
@@ -28,7 +19,6 @@ def _user_data_solicitante(registros=None):
         "cnt_registros": len(registros) if registros is not None else 0,
     }
 
-
 def _form_solicitud_valido():
     return {
         "cantidad_sangre_donada": "300",
@@ -36,7 +26,6 @@ def _form_solicitud_valido():
         "comentarios": "Paciente en observacion",
         "prioridad_solicitud": "2",
     }
-
 
 # =====================================================
 # PRUEBA 1 – Sin sesión redirige a home
@@ -50,7 +39,6 @@ def test_prueba1_sin_sesion_redirige_a_home(client):
     # ASSERT
     assert resp.status_code in (301, 302)
     assert resp.headers.get("Location") is not None
-
 
 # =====================================================
 # PRUEBA 2 – Con sesión renderiza formulario de solicitud
@@ -68,7 +56,6 @@ def test_prueba2_con_sesion_renderiza_formulario(client):
     assert resp.status_code == 200
     assert "Solicitud de Sangre" in body
     assert "Enviar Solicitud" in body
-
 
 # =====================================================
 # PRUEBA 3 – Formulario válido registra solicitud exitosamente
@@ -107,7 +94,6 @@ def test_prueba3_formulario_valido_registra_solicitud_exitosamente(client, monke
     with client.session_transaction() as sess:
         assert sess["registro_creado"] is True
 
-
 # =====================================================
 # PRUEBA 4 – Registro fallido deja bandera en False
 # STUB
@@ -125,7 +111,6 @@ def test_prueba4_registro_fallido_setea_bandera_false(client, monkeypatch):
     assert resp.status_code == 200
     with client.session_transaction() as sess:
         assert sess["registro_creado"] is False
-
 
 # =====================================================
 # PRUEBA 5 – Campos obligatorios vacíos: debería mostrar validaciones
@@ -155,7 +140,6 @@ def test_prueba5_campos_obligatorios_vacios_muestra_mensajes_de_validacion(clien
     # ASSERT
     assert resp.status_code == 200
     assert "campo obligatorio" in body.lower()
-
 
 # =====================================================
 # PRUEBA 6 – Solicitud registrada aparece en historial
@@ -190,7 +174,6 @@ def test_prueba6_solicitud_registrada_aparece_en_historial(client, monkeypatch):
     assert resp_historial.status_code == 200
     assert "Usted realizó una Solicitud el 23-03-2026" in body
     assert "de 300 ml" in body
-
 
 # =====================================================
 # PRUEBA 7 – Campos obligatorios vacíos no debería intentar registrar
@@ -227,7 +210,6 @@ def test_prueba7_campos_vacios_no_deberia_intentar_registrar(client, monkeypatch
     # ASSERT
     assert resp.status_code == 200
     assert llamadas == []
-
 
 # =====================================================
 # PRUEBA 8 – Error de validación debería dejar mensaje en sesión

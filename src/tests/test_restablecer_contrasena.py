@@ -7,15 +7,6 @@ sys.path.append(os.path.join(PROJECT_ROOT, "src"))
 
 from app import app
 
-
-@pytest.fixture
-def client():
-    app.config["TESTING"] = True
-    app.config["SECRET_KEY"] = "test-secret"
-    with app.test_client() as client:
-        yield client
-
-
 def test_get_renderiza_vista(client):
     """GET: renderiza página. Uso de Dummy."""
     # Arrange
@@ -27,7 +18,6 @@ def test_get_renderiza_vista(client):
     # Assert
     assert resp.status_code == 200
     assert dummy is None
-
 
 def test_redirige_si_ya_hay_sesion(client):
     """Si hay sesión activa, redirige a home. Uso de Dummy."""
@@ -42,7 +32,6 @@ def test_redirige_si_ya_hay_sesion(client):
     # Assert
     assert resp.status_code in (301, 302)
     assert dummy is not None
-
 
 def test_post_codigo_o_contrasena_invalidos(client, monkeypatch):
     """POST con código incorrecto o contraseñas no coincidentes. Stub + Dummy."""
@@ -64,7 +53,6 @@ def test_post_codigo_o_contrasena_invalidos(client, monkeypatch):
     with client.session_transaction() as sess:
         assert sess["cambio_contrasena_exitoso"] is False
     assert dummy is not None
-
 
 def test_post_con_codigo_y_contrasena_correctos(client, monkeypatch):
     """POST válido: actualiza contraseña y limpia sesión. Stubs + Spy."""
@@ -100,7 +88,6 @@ def test_post_con_codigo_y_contrasena_correctos(client, monkeypatch):
         assert "correo_valido_resultado" not in sess
     assert len(llamadas) == 1
     assert llamadas[0] == ("test@mail.com", "nuevaPass123")
-
 
 def test_post_falta_variable_sesion(client):
     """POST sin la variable de sesión 'correo_recuperacion'. Dummy (la variable falta, se espera KeyError)."""

@@ -12,15 +12,6 @@ from app import app
 # Contrato de la ruta `puntos` (app.py): JSON con esta clave; respuesta `success` y `nuevos_puntos`.
 JSON_REDIMIR_2000 = {"puntos_seleccionados": 2000}
 
-
-@pytest.fixture
-def client():
-    app.config["TESTING"] = True
-    app.config["SECRET_KEY"] = "test-secret"
-    with app.test_client() as client:
-        yield client
-
-
 # =====================================================
 # PRUEBA 1 – Sin sesión redirige a home
 # =====================================================
@@ -29,7 +20,6 @@ def test_prueba1_sin_sesion_redirige_a_home(client):
 
     assert resp.status_code in (301, 302)
     assert resp.headers.get("Location") is not None
-
 
 # =====================================================
 # PRUEBA 2 – Donante con puntos suficientes: success True y saldo en JSON
@@ -62,7 +52,6 @@ def test_prueba2_donante_con_puntos_suficientes_retorna_true(client, monkeypatch
     data = resp.get_json()
     assert data["success"] is True
     assert data["nuevos_puntos"] == 3000
-
 
 # =====================================================
 # PRUEBA 3 – Descuento reflejado en sesión (spy + delegación al servicio real)
@@ -103,7 +92,6 @@ def test_prueba3_donante_con_puntos_suficientes_descuenta_puntos_en_sesion(
     assert len(llamadas_sesion) == 1
     assert llamadas_sesion[0] == ("puntos", 3000)
 
-
 # =====================================================
 # PRUEBA 4 – Persistencia en BD invocada con documento y saldo final
 # =====================================================
@@ -141,7 +129,6 @@ def test_prueba4_donante_con_puntos_suficientes_persiste_puntos_en_base_de_datos
     assert len(llamadas_bd) == 1
     assert llamadas_bd[0] == ("123456789", "CC", 3000)
 
-
 # =====================================================
 # PRUEBA 5 – Notificación de redención al correo del donante
 # =====================================================
@@ -175,7 +162,6 @@ def test_prueba5_donante_con_puntos_suficientes_recibe_notificacion_por_correo(
     assert len(llamadas_email) == 1
     assert llamadas_email[0] == ("donante@ejemplo.com", "codigo-fake-123")
 
-
 # =====================================================
 # PRUEBA 6 – Sin puntos suficientes: success False, saldo sin cambio en JSON
 # =====================================================
@@ -201,7 +187,6 @@ def test_prueba6_donante_sin_puntos_suficientes_retorna_false(client, monkeypatc
     data = resp.get_json()
     assert data["success"] is False
     assert data["nuevos_puntos"] == 1000
-
 
 # =====================================================
 # PRUEBA 7 – Sin puntos suficientes: no sesión ni BD
@@ -241,7 +226,6 @@ def test_prueba7_donante_sin_puntos_suficientes_no_modifica_sesion_ni_bd(
     assert llamadas_sesion == []
     assert llamadas_bd == []
 
-
 # =====================================================
 # PRUEBA 8 – Sin puntos suficientes: no correo de redención
 # =====================================================
@@ -268,7 +252,6 @@ def test_prueba8_donante_sin_puntos_suficientes_no_recibe_notificacion(
     client.post("/puntos", json=JSON_REDIMIR_2000)
 
     assert llamadas_email == []
-
 
 # =====================================================
 # PRUEBA 9 – Borde: saldo igual al costo → queda en 0
@@ -311,7 +294,6 @@ def test_prueba9_donante_con_puntos_exactos_puede_redimir_y_queda_en_cero(
     assert data["success"] is True
     assert data["nuevos_puntos"] == 0
     assert llamadas_sesion[0] == ("puntos", 0)
-
 
 # =====================================================
 # PRUEBA opcional – POST sin clave `puntos_seleccionados`: comportamiento actual de app.py

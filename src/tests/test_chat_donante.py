@@ -6,13 +6,6 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 
 from app import app
 
-@pytest.fixture
-def client():
-    app.config["TESTING"] = True
-    app.config["SECRET_KEY"] = "test-secret"
-    with app.test_client() as client:
-        yield client
-
 # ============================================
 # PRUEBA 1 – Redirección por Rol Incorrecto -> Stub
 # ============================================
@@ -30,7 +23,6 @@ def test_chatbot_donante_redirige_si_no_es_donante(client):
     assert resp.status_code in (301, 302)
     assert "/chatbot_solicitante" in resp.location
 
-
 # ============================================
 # PRUEBA 2 – Acceso Correcto (GET)  -> Stub
 # ============================================
@@ -47,7 +39,6 @@ def test_chatbot_donante_render_get(client):
     assert resp.status_code == 200
     assert b"DONANTE" in resp.data
 
-
 # ============================================
 # PRUEBA 3 – Envío de Mensaje Exitoso -> MOCK
 # ============================================
@@ -57,7 +48,6 @@ def test_chatbot_donante_envia_mensaje_post(client, monkeypatch):
     # ARRANGE
     with client.session_transaction() as sess:
         sess["user_data"] = {"nombre": "Ana", "donante": True}
-
 
     def mock_generate(mensaje, user_data, rol_forzado):
         return "Respuesta simulada de IA para donantes"

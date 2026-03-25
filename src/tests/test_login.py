@@ -9,15 +9,6 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 
 from app import app
 
-
-@pytest.fixture
-def client():
-    app.config["TESTING"] = True
-    app.config["SECRET_KEY"] = "test-secret"
-    with app.test_client() as client:
-        yield client
-
-
 # -----------------------------
 # PRUEBA 1 (Camino 1):
 # Si ya hay sesión -> redirige a home
@@ -31,7 +22,6 @@ def test_login_redirige_si_ya_hay_sesion(client):
     assert resp.status_code in (301, 302)
 
     assert "/" in resp.headers.get("Location", "")
-
 
 # -----------------------------
 # PRUEBA 2 (Camino 2):
@@ -49,7 +39,6 @@ def test_login_get_limpia_indicador_cambio_contrasena(client):
         assert "cambio_contrasena_exitoso" in sess
         assert sess["cambio_contrasena_exitoso"] is None
 
-
 # -----------------------------
 # PRUEBA 3 (Camino 3):
 # GET normal sin sesión -> renderiza login
@@ -58,7 +47,6 @@ def test_login_get_limpia_indicador_cambio_contrasena(client):
 def test_login_get_renderiza_vista(client):
     resp = client.get("/login")
     assert resp.status_code == 200
-
 
 # -----------------------------
 # PRUEBA 4 (Camino 4):
@@ -97,7 +85,6 @@ def test_login_post_credenciales_invalidas(client, monkeypatch):
 
     assert llamadas["obtener"] == 0
     assert llamadas["generar"] == 0
-
 
 # -----------------------------
 # PRUEBA 5 (Camino 5):

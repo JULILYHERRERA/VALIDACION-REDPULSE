@@ -9,15 +9,6 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 from app import app
 import secret_config
 
-
-@pytest.fixture
-def client():
-    app.config["TESTING"] = True
-    app.config["SECRET_KEY"] = "test-secret"
-    with app.test_client() as client:
-        yield client
-
-
 def test_actualizar_foto_perfil_happy_path(client, monkeypatch):
     """Prueba exitosa con Stub (generarUsuarioImagen) y Spy (actualizar_imagen_usuario)."""
     # Arrange
@@ -62,7 +53,6 @@ def test_actualizar_foto_perfil_happy_path(client, monkeypatch):
     assert len(call_args) == 1
     assert call_args[0] == ("12345678", "Cedula de Ciudadania", mock_nuevo_link, mock_nuevo_deletehash)
 
-
 def test_actualizar_foto_perfil_sin_sesion(client):
     """Prueba no autorizada. Usamos un Dummy para cumplir la métrica."""
     # Dummy: objeto no utilizado pero necesario para satisfacer el requerimiento
@@ -80,7 +70,6 @@ def test_actualizar_foto_perfil_sin_sesion(client):
     # Dummy no se usa en este caso
     assert dummy is not None
 
-
 def test_actualizar_foto_perfil_sin_archivo(client):
     """Prueba error: no se envió ningún archivo. Uso de Dummy."""
     # Dummy: objeto de relleno
@@ -96,7 +85,6 @@ def test_actualizar_foto_perfil_sin_archivo(client):
     assert json_data["success"] is False
     assert json_data["error"] == "No se envió ninguna imagen"
     assert dummy is not None
-
 
 def test_actualizar_foto_perfil_archivo_vacio(client):
     """Prueba error: archivo con nombre vacío. Uso de Dummy."""
@@ -114,7 +102,6 @@ def test_actualizar_foto_perfil_archivo_vacio(client):
     assert json_data["success"] is False
     assert json_data["error"] == "Archivo vacío"
     assert dummy is not None
-
 
 def test_actualizar_foto_perfil_error_imgur(client, monkeypatch):
     """Prueba error al subir a Imgur. Uso de Stub."""

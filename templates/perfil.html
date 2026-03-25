@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
+    <meta name="csrf-token" content="{{ csrf_token() }}">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>RedPulse</title>
@@ -82,6 +83,8 @@
             fileInput.click();
         });
 
+        const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+
         fileInput.addEventListener('change', async (event) => {
             const file = event.target.files[0];
             if (!file) return;
@@ -92,6 +95,9 @@
             try {
             const response = await fetch('/actualizar_foto_perfil', {
                 method: 'POST',
+                headers: {
+                    'X-CSRFToken': csrfToken
+                },
                 body: formData
             });
             const result = await response.json();

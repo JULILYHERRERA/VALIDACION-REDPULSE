@@ -8,15 +8,6 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 import app as modulo
 from app import app
 
-
-@pytest.fixture
-def client():
-    app.config["TESTING"] = True
-    app.config["SECRET_KEY"] = "test-secret"
-    with app.test_client() as client:
-        yield client
-
-
 def _registro_solicitud(fecha="2026-03-23", cantidad=300, prioridad="Media", estado="Pendiente"):
     return {
         "TIPO_REGISTRO": "solicitud",
@@ -25,7 +16,6 @@ def _registro_solicitud(fecha="2026-03-23", cantidad=300, prioridad="Media", est
         "PRIORIDAD": prioridad,
         "ESTADO": estado,
     }
-
 
 # =====================================================
 # PRUEBA 1 – Sin sesión redirige a home
@@ -39,7 +29,6 @@ def test_prueba1_sin_sesion_redirige_a_home(client):
     # ASSERT
     assert resp.status_code in (301, 302)
     assert resp.headers.get("Location") is not None
-
 
 # =====================================================
 # PRUEBA 2 – Solicitante con sesión renderiza la vista
@@ -71,7 +60,6 @@ def test_prueba2_solicitante_con_sesion_renderiza_vista(client, monkeypatch):
     assert contexto["template"] == "movimientos.html"
     assert contexto["user_data"] == user_data
 
-
 # =====================================================
 # PRUEBA 3 – Muestra todas las solicitudes registradas
 # STUB + SPY
@@ -102,7 +90,6 @@ def test_prueba3_muestra_todas_las_solicitudes_registradas(client, monkeypatch):
     assert len(capturas) == 1
     assert len(capturas[0]["registros"]) == 3
 
-
 # =====================================================
 # PRUEBA 4 – Muestra detalle de cada solicitud en pantalla
 # =====================================================
@@ -132,7 +119,6 @@ def test_prueba4_muestra_detalle_de_cada_solicitud(client):
     assert "con una prioridad de Alta" in body
     assert "con estado actual Pendiente" in body
 
-
 # =====================================================
 # PRUEBA 5 – Sin registros, renderiza sin movimientos
 # STUB + SPY
@@ -159,7 +145,6 @@ def test_prueba5_sin_registros_renderiza_sin_movimientos(client, monkeypatch):
     assert contexto["template"] == "movimientos.html"
     assert contexto["user_data"]["registros"] == []
 
-
 # =====================================================
 # PRUEBA 6 – Sin registros visibles no muestra tarjetas históricas
 # =====================================================
@@ -176,7 +161,6 @@ def test_prueba6_sin_registros_no_muestra_tarjetas_historicas(client):
     assert resp.status_code == 200
     assert "Movimientos" in body
     assert "Movimiento 1" not in body
-
 
 # =====================================================
 # PRUEBA 7 – HU17: sin registros debería mostrar mensaje explícito
@@ -199,7 +183,6 @@ def test_prueba7_hu_sin_registros_muestra_mensaje_explicito(client):
     assert resp.status_code == 200
     assert "no existen registros" in body.lower()
 
-
 # =====================================================
 # PRUEBA 8 – user_data sin clave `registros` debería manejarse sin 500
 # (fallo esperado: la plantilla usa user_data['registros'] directamente)
@@ -220,7 +203,6 @@ def test_prueba8_user_data_sin_registros_deberia_manejarse_sin_error_500(client)
     # ASSERT
     assert resp.status_code == 200
     assert "no existen registros" in body.lower()
-
 
 # =====================================================
 # PRUEBA 9 – Registro incompleto debería mostrarse con valores por defecto

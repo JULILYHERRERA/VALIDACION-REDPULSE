@@ -15,18 +15,8 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 import app as modulo
 from app import app
 
-
-@pytest.fixture
-def client():
-    app.config["TESTING"] = True
-    app.config["SECRET_KEY"] = "test-secret"
-    with app.test_client() as client:
-        yield client
-
-
 def _sesion_admin():
     return {"nombre": "Admin", "admin": True, "enfermero": False}
-
 
 # =====================================================
 # PRUEBA 1 – Sin sesión redirige a home
@@ -40,7 +30,6 @@ def test_prueba1_sin_sesion_redirige_a_home(client):
     # ASSERT
     assert resp.status_code in (301, 302)
     assert resp.headers.get("Location") is not None
-
 
 # =====================================================
 # PRUEBA 2 – Usuario sin rol administrador redirige
@@ -56,7 +45,6 @@ def test_prueba2_usuario_sin_admin_redirige_a_home(client):
     # ASSERT
     assert resp.status_code in (301, 302)
     assert resp.headers.get("Location") is not None
-
 
 # =====================================================
 # PRUEBA 3 – Administrador accede al módulo y ve estructura de gráficos
@@ -82,7 +70,6 @@ def test_prueba3_admin_accede_modulo_muestra_graficos(client, monkeypatch):
     assert "monthlyDonationsChart" in body
     assert "bloodTypeChart" in body
     assert "chart.js" in body.lower()
-
 
 # =====================================================
 # PRUEBA 4 – Se consultan servicios y se serializa JSON para la vista
@@ -130,7 +117,6 @@ def test_prueba4_consulta_servicios_y_pasa_json_a_render_template(client, monkey
     assert json.loads(captura_render["donaciones_por_mes"]) == donaciones
     assert json.loads(captura_render["sangre_por_tipo"]) == sangre
 
-
 # =====================================================
 # PRUEBA 5 – Con donaciones por mes el HTML incluye los datos serializados
 # STUB
@@ -150,7 +136,6 @@ def test_prueba5_reporte_mensual_refleja_datos_en_pagina(client, monkeypatch):
     assert resp.status_code == 200
     assert '"Marzo"' in body or "'Marzo'" in body
     assert "20" in body
-
 
 # =====================================================
 # PRUEBA 6 – HU29: sin datos debería mostrar mensaje informativo

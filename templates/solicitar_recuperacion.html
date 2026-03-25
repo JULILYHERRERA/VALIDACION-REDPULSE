@@ -20,6 +20,7 @@
 
             <h2>¡Recupera tu contraseña!</h2>
             <form id="getEmailForm" method="POST">
+                <meta name="csrf-token" content="{{ csrf_token() }}">
                 <input type="email" name="correo" placeholder="Ingrese el Correo Electrónico de su cuenta" required>
                 
                 <button type="submit">Continuar</button>

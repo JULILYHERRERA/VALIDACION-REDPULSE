@@ -1,11 +1,13 @@
 #////////////////////////////// Importaciones //////////////////////////////////////////////
 from flask import Flask, render_template, request, redirect, url_for, session, jsonify
+from flask_wtf.csrf import CSRFProtect  # Agregado para protección CSRF
 
 #Imgur
 from servicios.Misc.flask_imgur_servicio import *
 
 #Misc
 import os
+import secrets  # Agregado para generación de tokens
 
 # Controlador para el login y registro
 from controladores.aunteticacion_controlador import *
@@ -37,8 +39,13 @@ app = Flask(__name__,
             static_folder= os.path.join(os.path.pardir, 'static'),
             template_folder= os.path.join(os.path.pardir, 'templates'))
 
+app.debug = False
+
 # Secreto para el App de Flask
 app.secret_key = secret_config.SECRET_KEY_FLASK
+
+# Habilitar protección CSRF
+csrf = CSRFProtect(app)
 
 # Imgur client id para la API
 app.config["IMGUR_ID"] = secret_config.IMGUR_CLIENT_ID
@@ -58,7 +65,6 @@ def pagina_notificaciones():
         return redirect(url_for("home"))
 
     return render_template("notificaciones.html", user_data=user_data)
-
 
 
 @app.route("/notificaciones/<correo>")
@@ -106,6 +112,9 @@ def return_home():
 
 @app.route('/actualizar_foto_perfil', methods=['POST'])
 def actualizar_foto_perfil():
+    # Protección CSRF explícita para peticiones JSON
+    csrf.protect()
+    
     # Verificar que el usuario está autenticado
     user_data = session.get('user_data')
     if not user_data:
@@ -155,7 +164,8 @@ def perfil():
     
     return render_template('perfil.html', user_data=user_data)
 
-@app.route('/movimientos', methods=['GET', 'POST'])
+@app.route('/movimientos', methods=['GET'])
+@app.route('/movimientos', methods=['POST'])
 def movimientos():
     # Obtener datos del usuario desde la sesión
     user_data = session.get('user_data')
@@ -166,7 +176,8 @@ def movimientos():
 
     return render_template('movimientos.html', user_data=user_data)
 
-@app.route('/puntos', methods=['GET', 'POST'])
+@app.route('/puntos', methods=['GET'])
+@app.route('/puntos', methods=['POST'])
 def puntos():
     # Obtener datos del usuario desde la sesión //verificamos si es donante para poder ver puntos
     user_data = session.get('user_data')
@@ -177,6 +188,9 @@ def puntos():
     
     # Obtener los puntos seleccionados
     if request.method == 'POST':
+        # Protección CSRF explícita para peticiones JSON
+        csrf.protect()
+        
         data = request.get_json()  # Obtener los datos JSON enviados
         puntos_seleccionados = int(data.get('puntos_seleccionados'))  # Acceder a los puntos seleccionados especificamente
 
@@ -186,7 +200,8 @@ def puntos():
 
     return render_template('puntos.html', user_data=user_data)
 
-@app.route('/asignar_puntos', methods=['GET', 'POST'])
+@app.route('/asignar_puntos', methods=['GET'])
+@app.route('/asignar_puntos', methods=['POST'])
 def asignar_puntos():
     user_data = session.get('user_data')
 
@@ -216,7 +231,8 @@ def asignar_puntos():
 
     return render_template('asignar_puntos.html')
 
-@app.route('/solicitud_donacion', methods=['GET', 'POST'])
+@app.route('/solicitud_donacion', methods=['GET'])
+@app.route('/solicitud_donacion', methods=['POST'])
 def solicitud_donacion():
     # Obtener datos del usuario desde la sesión
     user_data = session.get('user_data')
@@ -236,7 +252,8 @@ def solicitud_donacion():
 
 # Rutas de administrador (estadisticas y solicitudes pendientes)
 
-@app.route('/solicitudes_pendientes', methods=['GET', 'POST'])
+@app.route('/solicitudes_pendientes', methods=['GET'])
+@app.route('/solicitudes_pendientes', methods=['POST'])
 def solicitudes_pendientes():
     # Obtener datos del usuario desde la sesión
     user_data = session.get('user_data')
@@ -249,6 +266,9 @@ def solicitudes_pendientes():
     solicitudes = obtenerSolicitudesPendientes()
     
     if request.method == 'POST':
+        # Protección CSRF explícita para peticiones JSON
+        csrf.protect()
+        
         data = request.get_json()
         solicitud_id = data.get('id')
         accion = data.get('accion')
@@ -276,7 +296,8 @@ def estadisticas():
                            donaciones_por_mes=json.dumps(donaciones_por_mes), 
                            sangre_por_tipo=json.dumps(sangre_por_tipo) )
 
-@app.route('/convertir_enfermero', methods=['GET', 'POST'])
+@app.route('/convertir_enfermero', methods=['GET'])
+@app.route('/convertir_enfermero', methods=['POST'])
 def convertir_enfermero():
     # Verificar que el usuario sea administrador
     user_data = session.get('user_data')
@@ -322,7 +343,8 @@ def convertir_enfermero():
                            converted_user=converted_user,
                            nombre_admin=user_data['nombre'])
 
-@app.route('/visualizar_usuarios', methods=['GET', 'POST'])
+@app.route('/visualizar_usuarios', methods=['GET'])
+@app.route('/visualizar_usuarios', methods=['POST'])
 def visualizar_usuarios():
     # Verificar que el usuario sea administrador
     user_data = session.get('user_data')
@@ -370,7 +392,8 @@ def visualizar_usuarios():
 
 # Rutas para el enfermero
 
-@app.route('/enfermero', methods=['GET', 'POST'])
+@app.route('/enfermero', methods=['GET'])
+@app.route('/enfermero', methods=['POST'])
 def enfermero():
     # Obtener datos del usuario desde la sesión
     user_data = session.get('user_data')
@@ -405,7 +428,8 @@ def enfermero():
         
     return render_template('enfermero.html', nombre_enfermero = user_data['nombre'])
     
-@app.route('/agregar_donacion', methods=['GET', 'POST'])
+@app.route('/agregar_donacion', methods=['GET'])
+@app.route('/agregar_donacion', methods=['POST'])
 def agregar_donacion():
     # Obtener datos del usuario de la sesion y el usuario obtenido
     user_data = session.get('user_data')
@@ -430,7 +454,8 @@ def agregar_donacion():
 
 # Ruta de login y registro.
 
-@app.route('/login', methods=['GET', 'POST'])
+@app.route('/login', methods=['GET'])
+@app.route('/login', methods=['POST'])
 def login():
     # Verificar si ya hay datos de usuario en la sesión
     if 'user_data' in session:
@@ -461,7 +486,8 @@ def login():
 
     return render_template('login.html')
 
-@app.route('/registro', methods=['GET', 'POST'])
+@app.route('/registro', methods=['GET'])
+@app.route('/registro', methods=['POST'])
 def registro():
     # Verificar si ya hay datos de usuario en la sesión
     if 'user_data' in session:
@@ -506,7 +532,8 @@ def registro():
 
 # Apartados de solicitar y reestablecer contraseña
 
-@app.route('/solicitar_recuperacion', methods=['GET', 'POST'])
+@app.route('/solicitar_recuperacion', methods=['GET'])
+@app.route('/solicitar_recuperacion', methods=['POST'])
 def solicitar_recuperacion():
     # Verificar si ya hay datos de usuario en la sesión
     if 'user_data' in session:
@@ -534,7 +561,8 @@ def solicitar_recuperacion():
     
     return render_template('solicitar_recuperacion.html')
 
-@app.route('/restablecer_contrasena', methods=['GET', 'POST'])
+@app.route('/restablecer_contrasena', methods=['GET'])
+@app.route('/restablecer_contrasena', methods=['POST'])
 def restablecer_contrasena():
     # Verificar si ya hay datos de usuario en la sesión
     if 'user_data' in session:
@@ -561,7 +589,8 @@ def restablecer_contrasena():
     
     return render_template('restablecer_contrasena.html')
 
-@app.route('/chatbot', methods=['GET', 'POST'])
+@app.route('/chatbot', methods=['GET'])
+@app.route('/chatbot', methods=['POST'])
 def chatbot():
     user_data = session.get('user_data')
 
@@ -569,7 +598,8 @@ def chatbot():
         return redirect(url_for('login'))
 
 
-@app.route('/chatbot_donante', methods=['GET', 'POST'])
+@app.route('/chatbot_donante', methods=['GET'])
+@app.route('/chatbot_donante', methods=['POST'])
 def chatbot_donante():
     user_data = session.get('user_data')
     # Solo donante entra
@@ -585,7 +615,8 @@ def chatbot_donante():
     return jsonify(respuesta=respuesta)
 
 
-@app.route('/chatbot_solicitante', methods=['GET', 'POST'])
+@app.route('/chatbot_solicitante', methods=['GET'])
+@app.route('/chatbot_solicitante', methods=['POST'])
 def chatbot_solicitante():
     user_data = session.get('user_data')
 
@@ -606,7 +637,8 @@ def chatbot_solicitante():
     return jsonify(respuesta=respuesta)
 
 
-@app.route('/filtrar_solicitudes', methods=['GET', 'POST'])
+@app.route('/filtrar_solicitudes', methods=['GET'])
+@app.route('/filtrar_solicitudes', methods=['POST'])
 def filtrar_solicitudes():
     solicitudes_filtradas = []
 
@@ -620,6 +652,5 @@ def filtrar_solicitudes():
     )
 
 
-
 if __name__ == '__main__':
-    app.run(host="0.0.0.0", port=5000) # debug=True --> cuando se use localmente
+    app.run(debug=False) # debug=True --> cuando se use localmente

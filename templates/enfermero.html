@@ -25,6 +25,7 @@
             </section>
 
             <form method="POST">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                 <div class="form-group">
                     <label for="cedula">Ingrese Cédula del Donante</label>
                     <input type="text" id="cedula" name="cedula" placeholder="Ingrese la cédula" required>

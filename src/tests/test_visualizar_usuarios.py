@@ -7,15 +7,6 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 
 from app import app
 
-
-@pytest.fixture
-def client():
-    app.config["TESTING"] = True
-    app.config["SECRET_KEY"] = "test-secret"
-    with app.test_client() as client:
-        yield client
-
-
 def test_visualizar_usuarios_get_happy_path(client, monkeypatch):
     """Prueba GET exitosa. Stub y Dummy."""
     # Stub: lista de usuarios simulada
@@ -38,7 +29,6 @@ def test_visualizar_usuarios_get_happy_path(client, monkeypatch):
     assert b"User1" in response.data
     assert b"User2" in response.data
     assert dummy is not None
-
 
 def test_visualizar_usuarios_post_eliminar_no_admin(client, monkeypatch):
     """Prueba POST exitosa: eliminar usuario no admin. Stub + Spy."""
@@ -69,7 +59,6 @@ def test_visualizar_usuarios_post_eliminar_no_admin(client, monkeypatch):
     assert len(call_args) == 1
     assert call_args[0] == ("123", "Cedula")
 
-
 def test_visualizar_usuarios_post_eliminar_admin(client, monkeypatch):
     """Prueba unhappy: intento de eliminar admin. Stub."""
     # Stub: usuario admin
@@ -87,7 +76,6 @@ def test_visualizar_usuarios_post_eliminar_admin(client, monkeypatch):
     assert response.status_code == 302
     with client.session_transaction() as sess:
         assert sess["admin_usuarios_status"] == "cannot_delete_admin"
-
 
 def test_visualizar_usuarios_post_error_al_eliminar(client, monkeypatch):
     """Prueba unhappy: error inesperado al eliminar. Stub + Spy para contar llamadas."""
@@ -122,7 +110,6 @@ def test_visualizar_usuarios_post_error_al_eliminar(client, monkeypatch):
     # Verificamos que el Spy registró la llamada a eliminarUsuario
     assert len(call_args) == 1
     assert call_args[0] == ("123", "Cedula")
-
 
 def test_visualizar_usuarios_no_admin(client):
     """Prueba unhappy: usuario sin admin intenta acceder. Dummy."""

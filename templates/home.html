@@ -19,9 +19,9 @@
         
         <li><a href="{{ url_for('solicitud_donacion') }}">Solicitar Sangre</a></li>
 
-        <!-- 🔔 SOLO DONANTES -->
+        <!-- SOLO DONANTES -->
         {% if user_data.get('donante') %}
-            <li><a href="/notificaciones">🔔 Notificaciones</a></li>
+            <li><a href="/notificaciones">Notificaciones</a></li>
         {% endif %}
 
         {% if not (user_data.get('admin') or user_data.get('enfermero')) %}

@@ -7,15 +7,6 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 import app as modulo
 from app import app
 
-
-@pytest.fixture
-def client():
-    app.config["TESTING"] = True
-    app.config["SECRET_KEY"] = "test-secret"
-    with app.test_client() as client:
-        yield client
-
-
 # =====================================================
 # PRUEBA 1 – Sin sesión redirige
 # =====================================================
@@ -28,7 +19,6 @@ def test_prueba1_sin_sesion_redirige_a_home(client):
     # ASSERT
     assert resp.status_code in (301, 302)
     assert resp.headers.get("Location") is not None
-
 
 # =====================================================
 # PRUEBA 2 – Con sesión renderiza vista
@@ -55,7 +45,6 @@ def test_prueba2_con_sesion_renderiza_vista(client, monkeypatch):
     assert resp.status_code == 200
     assert contexto["template"] == "puntos.html"
     assert contexto["user_data"]["puntos"] == 2000
-
 
 # =====================================================
 # PRUEBA 3 – POST válido procesa puntos
@@ -84,7 +73,6 @@ def test_prueba3_post_valido_procesa_puntos(client, monkeypatch):
     assert llamadas == [4000]
     assert resp.get_json() == {"success": True, "nuevos_puntos": 1500}
 
-
 # =====================================================
 # PRUEBA 4 – POST sin JSON debería manejarse
 # FALLA
@@ -99,7 +87,6 @@ def test_prueba4_post_sin_json_deberia_manejarse(client):
 
     # ASSERT
     assert resp.status_code == 200
-
 
 # =====================================================
 # PRUEBA 5 – POST inválido no debería procesarse

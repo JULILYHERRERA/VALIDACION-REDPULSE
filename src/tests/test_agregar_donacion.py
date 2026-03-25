@@ -7,15 +7,6 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 import app as modulo
 from app import app
 
-
-@pytest.fixture
-def client():
-    app.config["TESTING"] = True
-    app.config["SECRET_KEY"] = "test-secret"
-    with app.test_client() as client:
-        yield client
-
-
 # =====================================================
 # PRUEBA 1 – Sin enfermero redirige
 # =====================================================
@@ -28,7 +19,6 @@ def test_prueba1_sin_enfermero_redirige_a_home(client):
     # ASSERT
     assert resp.status_code in (301, 302)
     assert resp.headers.get("Location") is not None
-
 
 # =====================================================
 # PRUEBA 2 – GET reinicia bandera
@@ -51,7 +41,6 @@ def test_prueba2_get_renderiza_y_reinicia_bandera(client):
 
     with client.session_transaction() as sess:
         assert sess["enfermero_usuario_verificacion"] is None
-
 
 # =====================================================
 # PRUEBA 3 – POST válido guarda resultado
@@ -87,7 +76,6 @@ def test_prueba3_post_valido_guarda_resultado(client, monkeypatch):
     with client.session_transaction() as sess:
         assert sess["donacion_exitosa"] is True
 
-
 # =====================================================
 # PRUEBA 4 – POST sin cantidad no debería procesarse
 # SPY (FALLA)
@@ -117,7 +105,6 @@ def test_prueba4_post_sin_cantidad_no_deberia_procesarse(client, monkeypatch):
     # ASSERT
     assert resp.status_code == 200
     assert llamadas == []
-
 
 # =====================================================
 # PRUEBA 5 – POST sin usuario obtenido no debería procesarse

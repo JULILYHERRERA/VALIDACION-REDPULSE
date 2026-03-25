@@ -20,6 +20,7 @@
 
             <h2>¡Recupera tu contraseña!</h2>
             <form id="restorePasswordForm" method="POST">
+                <meta name="csrf-token" content="{{ csrf_token() }}">
                 <input type="text" name="codigo_recuperacion" placeholder="Ingrese el codigo enviado a su correo" required>
                 <input type="password" name="nueva_contrasena" placeholder="Escribe tu nueva contraseña" required>
                 <input type="password" name="confirmacion_nueva_contrasena" placeholder="Confirma contraseña" required>

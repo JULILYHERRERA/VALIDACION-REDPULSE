@@ -30,6 +30,7 @@
 
             <!-- Formulario de donación -->
             <form class="donation-form" method="POST">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                 <label for="quantity">Cantidad Donada (ml)</label>
                 <input type="number" id="quantity" name="cantidad_donada" required min="100" max="500" placeholder="Ingrese la cantidad en ml">
                 

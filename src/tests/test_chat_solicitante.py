@@ -7,15 +7,6 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 import app as modulo
 from app import app
 
-
-@pytest.fixture
-def client():
-    app.config["TESTING"] = True
-    app.config["SECRET_KEY"] = "test-secret"
-    with app.test_client() as client:
-        yield client
-
-
 # =====================================================
 # PRUEBA 1 – Sin sesión redirige a login
 # =====================================================
@@ -28,7 +19,6 @@ def test_prueba1_sin_sesion_redirige_a_login(client):
     # ASSERT
     assert resp.status_code in (301, 302)
     assert "/login" in resp.headers.get("Location", "")
-
 
 # =====================================================
 # PRUEBA 2 – Donante redirige a chatbot_donante
@@ -44,7 +34,6 @@ def test_prueba2_donante_redirige_a_chatbot_donante(client):
     # ASSERT
     assert resp.status_code in (301, 302)
     assert resp.headers.get("Location") is not None
-
 
 # =====================================================
 # PRUEBA 3 – GET de solicitante renderiza chat
@@ -73,7 +62,6 @@ def test_prueba3_get_solicitante_renderiza_chat(client, monkeypatch):
     assert contexto["template"] == "chatbot.html"
     assert contexto["rol_chat"] == "SOLICITANTE"
     assert contexto["user_data"]["nombre"] == "Juliana"
-
 
 # =====================================================
 # PRUEBA 4 – POST válido genera respuesta
@@ -105,7 +93,6 @@ def test_prueba4_post_valido_genera_respuesta(client, monkeypatch):
     assert llamadas[0][2] == "SOLICITANTE"
     assert resp.get_json() == {"respuesta": "RESPUESTA_MOCK"}
 
-
 # =====================================================
 # PRUEBA 5 – POST sin JSON debería manejarse
 # FALLA
@@ -120,7 +107,6 @@ def test_prueba5_post_sin_json_deberia_manejarse(client):
 
     # ASSERT
     assert resp.status_code == 200
-
 
 # =====================================================
 # PRUEBA 6 – POST sin mensaje no debería procesarse

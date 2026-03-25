@@ -8,22 +8,11 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 import app as modulo
 from app import app
 
-
-@pytest.fixture
-def client():
-    app.config["TESTING"] = True
-    app.config["SECRET_KEY"] = "test-secret"
-    with app.test_client() as client:
-        yield client
-
-
 def _sesion_enfermero_base():
     return {"nombre": "Sandra", "enfermero": True, "admin": False}
 
-
 def _usuario_obtenido_base():
     return {"cedula_usuario": "123456789", "tipo_cedula_usuario": "Cedula de Ciudadania"}
-
 
 # =====================================================
 # PRUEBA 1 – Sin sesión debería redirigir (debilidad actual en la ruta)
@@ -42,7 +31,6 @@ def test_prueba1_sin_sesion_deberia_redirigir_a_home(client):
     assert resp.status_code in (301, 302)
     assert resp.headers.get("Location") is not None
 
-
 # =====================================================
 # PRUEBA 2 – Usuario sin rol enfermero es redirigido
 # =====================================================
@@ -57,7 +45,6 @@ def test_prueba2_usuario_sin_rol_enfermero_es_redirigido(client):
     # ASSERT
     assert resp.status_code in (301, 302)
     assert resp.headers.get("Location") is not None
-
 
 # =====================================================
 # PRUEBA 3 – Enfermero logueado visualiza formulario principal
@@ -75,7 +62,6 @@ def test_prueba3_enfermero_logueado_visualiza_formulario_principal(client):
     assert resp.status_code == 200
     assert "Ingrese Cédula del Donante" in body
     assert "Verificar Cédula" in body
-
 
 # =====================================================
 # PRUEBA 4 – Cédula válida: verifica, guarda sesión y habilita flujo
@@ -107,7 +93,6 @@ def test_prueba4_cedula_valida_verifica_y_guarda_usuario_objetivo(client, monkey
         assert sess["enfermero_usuario_verificacion"] is True
         assert sess["enfermero_usuario_obtenido"] == _usuario_obtenido_base()
 
-
 # =====================================================
 # PRUEBA 5 – Cédula inexistente: marca verificación en False
 # STUB
@@ -130,7 +115,6 @@ def test_prueba5_cedula_inexistente_marca_verificacion_false(client, monkeypatch
         assert sess["enfermero_usuario_verificacion"] is False
         assert sess.get("enfermero_usuario_obtenido") in (None, {})
 
-
 # =====================================================
 # PRUEBA 6 – Con usuario verificado muestra formulario de donación
 # =====================================================
@@ -149,7 +133,6 @@ def test_prueba6_con_usuario_verificado_muestra_formulario_de_donacion(client):
     assert "Cantidad Donada (ml)" in body
     assert "Fecha de la Donación" in body
     assert "Asignación de Puntos" in body
-
 
 # =====================================================
 # PRUEBA 7 – Datos válidos registran donación y guardan estado exitoso
@@ -181,7 +164,6 @@ def test_prueba7_datos_validos_registran_donacion_y_guardan_estado(client, monke
     with client.session_transaction() as sess:
         assert sess["donacion_exitosa"] is True
 
-
 # =====================================================
 # PRUEBA 8 – Cantidad inválida debería mostrar validación, no error 500
 # (debilidad actual: int(request.form.get(...)) sin manejo)
@@ -207,7 +189,6 @@ def test_prueba8_cantidad_invalida_deberia_responder_validacion(client):
     assert resp.status_code == 200
     assert "validación" in body.lower()
 
-
 # =====================================================
 # PRUEBA 9 – Sin usuario verificado debería bloquear registro limpiamente
 # (debilidad actual: acceso directo a user_obtained_data['cedula_usuario'])
@@ -230,7 +211,6 @@ def test_prueba9_sin_usuario_verificado_deberia_bloquear_registro_limpiamente(cl
 
     # ASSERT
     assert resp.status_code in (301, 302, 400)
-
 
 # =====================================================
 # PRUEBA 10 – Campos vacíos no deberían consultar existencia en backend
