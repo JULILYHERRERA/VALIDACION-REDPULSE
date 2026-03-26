@@ -214,7 +214,7 @@ def obtenerCantidadSangreDonada(tipo_sangre):
         # Consulta SQL para sumar las cantidades de donaciones del tipo de sangre especificado
         sql = """
             SELECT COALESCE(SUM(cantidad), 0) 
-            FROM registros 
+            FROM registros pytest -v src/tests/test_chatbot_solicitante.py
             WHERE tipo_registro = 'Donacion' AND tipo_sangre = %s
         """
         cursor.execute(sql, (tipo_sangre,))
