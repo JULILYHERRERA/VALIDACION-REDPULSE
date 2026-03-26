@@ -10,10 +10,10 @@ from werkzeug.security import generate_password_hash, check_password_hash
 import secrets
 
 # Base de datos.
-from servicios.BaseDeDatos.usuario_bd_servicio import *
+from servicios.BaseDeDatos.usuario_bd_servicio import verificarExistenciaUsuario, insertarEnTabla, obtenerUsuarioPorDocumento   
 
 # Usuario.
-from modelos.usuario import *
+from modelos.usuario import usuario, TipoDocumento, TipoSangre
 
 #////////////////////////////// Funcionalidades //////////////////////////////////////////////
 
