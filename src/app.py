@@ -18,6 +18,7 @@ from controladores.aunteticacion_controlador import obtenerValoresUsuario,verifi
 
 # Controlador de puntos
 from controladores.puntos_controlador import procesar_puntos
+from servicios.sesion_servicio import obtenerValorUsuarioSesion
 
 # Controlador de solicitudes pendientes
 from controladores.solicitudes_pendientes_controlador import verificarNivelesDeSangre
@@ -178,6 +179,10 @@ def movimientos():
     if not user_data:
        return redirect(url_for('home'))
 
+    # Asegurar que 'registros' exista en user_data para evitar errores en la plantilla
+    if 'registros' not in user_data:
+        user_data['registros'] = []
+
     return render_template('movimientos.html', user_data=user_data)
 
 @app.route('/puntos', methods=['GET'])
@@ -196,7 +201,13 @@ def puntos():
         csrf.protect()
         
         data = request.get_json()  # Obtener los datos JSON enviados
-        puntos_seleccionados = int(data.get('puntos_seleccionados'))  # Acceder a los puntos seleccionados especificamente
+        if not data or 'puntos_seleccionados' not in data:
+            return jsonify(success=False, error="Datos incompletos"), 400
+            
+        try:
+            puntos_seleccionados = int(data.get('puntos_seleccionados'))  # Acceder a los puntos seleccionados especificamente
+        except (ValueError, TypeError):
+            return jsonify(success=False, error="Puntos seleccionados inválidos"), 400
 
         puntos_procesados = procesar_puntos(puntos_seleccionados)
         

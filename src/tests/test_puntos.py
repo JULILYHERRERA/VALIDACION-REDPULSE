@@ -86,7 +86,7 @@ def test_prueba4_post_sin_json_deberia_manejarse(client):
     resp = client.post("/puntos")
 
     # ASSERT
-    assert resp.status_code == 200
+    assert resp.status_code == 400
 
 # =====================================================
 # PRUEBA 5 – POST inválido no debería procesarse
@@ -110,5 +110,5 @@ def test_prueba5_post_valor_invalido_no_deberia_procesarse(client, monkeypatch):
     resp = client.post("/puntos", json={"puntos_seleccionados": "hola"})
 
     # ASSERT
-    assert resp.status_code == 200
+    assert resp.status_code == 400
     assert llamadas == []

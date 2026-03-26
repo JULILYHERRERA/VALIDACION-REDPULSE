@@ -296,15 +296,9 @@ def test_prueba9_donante_con_puntos_exactos_puede_redimir_y_queda_en_cero(
     assert llamadas_sesion[0] == ("puntos", 0)
 
 # =====================================================
-# PRUEBA opcional – POST sin clave `puntos_seleccionados`: comportamiento actual de app.py
-# (int(None) → error). Documenta deuda técnica si se desea manejar 400 en la ruta.
+# PRUEBA 10 – POST sin clave `puntos_seleccionados` retorna 400
 # =====================================================
-@pytest.mark.xfail(
-    reason="app.py hace int(data.get('puntos_seleccionados')) sin validar None",
-    raises=TypeError,
-    strict=True,
-)
-def test_post_json_sin_puntos_seleccionados_provoca_typeerror(client):
+def test_prueba10_post_json_sin_puntos_seleccionados_retorna_400(client):
     with client.session_transaction() as sess:
         sess["user_data"] = {
             "puntos": 5000,
@@ -313,4 +307,8 @@ def test_post_json_sin_puntos_seleccionados_provoca_typeerror(client):
             "correo": "a@b.c",
         }
 
-    client.post("/puntos", json={"puntos": 2000})
+    resp = client.post("/puntos", json={"puntos": 2000})
+    assert resp.status_code == 400
+    data = resp.get_json()
+    assert data["success"] is False
+    assert data["error"] == "Datos incompletos"

@@ -2,6 +2,7 @@
 import sys
 sys.path.append("src")
 
+from modelos.usuario import Usuario, TipoDocumento, TipoSangre
 # Encriptacion.
 from werkzeug.security import generate_password_hash, check_password_hash
 # generate_password_hash: genera la encriptacion.
@@ -13,7 +14,7 @@ import secrets
 from servicios.BaseDeDatos.usuario_bd_servicio import verificarExistenciaUsuario, insertarEnTabla, obtenerUsuarioPorDocumento
 
 # Usuario.
-from modelos.usuario import usuario, TipoDocumento, TipoSangre
+
 
 #////////////////////////////// Funcionalidades //////////////////////////////////////////////
 

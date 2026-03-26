@@ -29,17 +29,23 @@
             
             <h2>Movimientos</h2>
 
-            {% for registro in user_data['registros'] %}
-            <div class="historical">
-                <h3>Movimiento {{ loop.index }}</h3>
-                <p>
-                    Usted realizó una {{ registro['TIPO_REGISTRO'] }} el {{ registro['FECHA'] }}
-                    de {{ registro['CANTIDAD'] }} ml
-                    {% if registro['PRIORIDAD'] %} con una prioridad de {{ registro['PRIORIDAD'] }}{% endif %}
-                    {% if registro['ESTADO'] %} con estado actual {{ registro['ESTADO'] }}{% endif %}.
-                </p>
-            </div>
-            {% endfor %}
+            {% if user_data['registros'] %}
+                {% for registro in user_data['registros'] %}
+                <div class="historical">
+                    <h3>Movimiento {{ loop.index }}</h3>
+                    <p>
+                        Usted realizó una {{ registro['TIPO_REGISTRO'] | capitalize }} el {{ registro['FECHA'] or 'fecha no disponible' }}
+                        de {{ registro['CANTIDAD'] or 0 }} ml
+                        {% if registro['PRIORIDAD'] %} con una prioridad de {{ registro['PRIORIDAD'] }}{% endif %}
+                        {% if registro['ESTADO'] %} con estado actual {{ registro['ESTADO'] }}{% endif %}.
+                    </p>
+                </div>
+                {% endfor %}
+            {% else %}
+                <div class="no-registros">
+                    <p>No existen registros de movimientos actualmente.</p>
+                </div>
+            {% endif %}
             
             <button onclick="redirectToView()" class="back-button">Volver</button>
         </main>
