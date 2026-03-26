@@ -1,35 +1,39 @@
 #////////////////////////////// Importaciones //////////////////////////////////////////////
-from flask import Flask, render_template, request, redirect, url_for, session, jsonify
-from flask_wtf.csrf import CSRFProtect  # Agregado para protección CSRF
+import json
+import secrets
+import email 
+import secret_config
 
+from flask import Flask, render_template, request, redirect, url_for, session, jsonify
+from flask_wtf.csrf import CSRFProtect
 #Imgur
-from servicios.Misc.flask_imgur_servicio import *
+from servicios.Misc.flask_imgur_servicio import Imgur
 
 #Misc
 import os
 import secrets  # Agregado para generación de tokens
 
 # Controlador para el login y registro
-from controladores.aunteticacion_controlador import *
+from controladores.aunteticacion_controlador import obtenerValoresUsuario,verificarUsuario,registrarUsuario,verificacionLogin
 
 # Controlador de puntos
-from controladores.puntos_controlador import *
+from controladores.puntos_controlador import procesarPuntos
 
 # Controlador de solicitudes pendientes
-from controladores.solicitudes_pendientes_controlador import *
+from controladores.solicitudes_pendientes_controlador import verificarNivelesDeSangre
 
 # Base de datos
-from servicios.BaseDeDatos.usuario_bd_servicio import *
-from servicios.BaseDeDatos.registro_bd_servicio import *
+from servicios.BaseDeDatos.usuario_bd_servicio import obtenerUsuarioPorDocumento, actualizarPuntos, actualizarEstadoEnfermero, obtenerTodosUsuariosNoAdmin, eliminarUsuario, actualizar_imagen_usuario
+from servicios.BaseDeDatos.registro_bd_servicio import obtenerDonacionesPorMes, obtenerCantidadDeSangrePorTipo, actualizarEstadoRegistro, obtenerSolicitudesPendientes
+
 
 # Chabot
-from servicios.chatbot_servicio import *
+from servicios.chatbot_servicio import generate_response
 
-# Importar el servicio de sesiones construido.
-from servicios.sesion_servicio import *
+
 
 # Importar el servicio de donaciones.
-from servicios.registro_servicio import *
+from servicios.registro_servicio import crearRegistro, insertarDonacion
 from servicios.notificaciones_servicio import obtener_notificaciones
 
 
