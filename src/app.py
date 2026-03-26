@@ -27,14 +27,15 @@ from servicios.sesion_servicio import obtenerValorUsuarioSesion
 from controladores.solicitudes_pendientes_controlador import verificarNivelesDeSangre
 
 # Base de datos
-from servicios.BaseDeDatos.usuario_bd_servicio import obtenerUsuarioPorDocumento, actualizarPuntos, actualizarEstadoEnfermero, obtenerTodosUsuariosNoAdmin, eliminarUsuario, actualizar_imagen_usuario, verificarCorreo, verificarExistenciaUsuario
+from servicios.BaseDeDatos.usuario_bd_servicio import obtenerUsuarioPorDocumento, actualizarPuntos, actualizarEstadoEnfermero, obtenerTodosUsuariosNoAdmin, eliminarUsuario, actualizar_imagen_usuario, verificarCorreo, verificarExistenciaUsuario, obtenerCodigoRecuperacion, actualizarContrasena
 from servicios.BaseDeDatos.registro_bd_servicio import obtenerDonacionesPorMes, obtenerCantidadDeSangrePorTipo, actualizarEstadoRegistro, obtenerSolicitudesPendientes
 
 
 # Chabot
 from servicios.chatbot_servicio import generate_response
 
-
+# Notificaciones
+from servicios.notificaciones_servicio import Notificaciones
 
 # Importar el servicio de donaciones.
 from servicios.registro_servicio import crearRegistro, insertarDonacion
@@ -54,6 +55,9 @@ app.secret_key = secret_config.SECRET_KEY_FLASK
 
 # Habilitar protección CSRF
 csrf = CSRFProtect(app)
+
+# Notificador
+notificador = Notificaciones()
 
 # Imgur client id para la API
 app.config["IMGUR_ID"] = secret_config.IMGUR_CLIENT_ID
@@ -625,7 +629,7 @@ def solicitar_recuperacion():
         session['correo_recuperacion_asociado'] = obtained_email
 
         # Enviar notificación por correo con el enlace de recuperación
-        email.recuperar_contra_notificacion(obtained_email, codigo)
+        notificador.recuperar_contra_notificacion(obtained_email, codigo)
     
     return render_template('solicitar_recuperacion.html')
 
@@ -651,9 +655,9 @@ def restablecer_contrasena():
         session['cambio_contrasena_exitoso'] = True
 
         actualizarContrasena(session['correo_recuperacion_asociado'], nueva_contrasena)
-        session['correo_recuperacion'] = None
-        session['correo_recuperacion_asociado'] = None
-        session['correo_valido_resultado'] = None
+        session.pop('correo_recuperacion', None)
+        session.pop('correo_recuperacion_asociado', None)
+        session.pop('correo_valido_resultado', None)
     
     return render_template('restablecer_contrasena.html')
 
@@ -692,7 +696,6 @@ def chatbot_donante():
 
 @app.route('/chatbot_solicitante', methods=['GET'])
 @app.route('/chatbot_solicitante', methods=['POST'])
-@csrf.exempt
 def chatbot_solicitante():
     user_data = session.get('user_data')
 

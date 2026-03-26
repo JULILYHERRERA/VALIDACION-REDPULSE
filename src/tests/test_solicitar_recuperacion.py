@@ -54,12 +54,16 @@ def test_post_correo_registrado_envia_codigo(client, monkeypatch):
     monkeypatch.setattr("app.verificarCorreo", lambda email: True)  # Stub
     monkeypatch.setattr("app.obtenerCodigoRecuperacion", lambda email: "ABC123")  # Stub
 
-    # Spy: registra llamada a recuperar_contra_notificacion
+    # Spy: registra llamada a Notificaciones.recuperar_contra_notificacion
     llamadas = {"count": 0, "args": None}
-    def spy_enviar(email, codigo):
+    def spy_enviar(self, email, codigo):          # self es la instancia de Notificaciones
         llamadas["count"] += 1
         llamadas["args"] = (email, codigo)
-    monkeypatch.setattr("app.email.recuperar_contra_notificacion", spy_enviar)
+
+    monkeypatch.setattr(
+        "servicios.notificaciones_servicio.Notificaciones.recuperar_contra_notificacion",
+        spy_enviar
+    )
 
     correo = "si@existe.com"
 
@@ -81,9 +85,13 @@ def test_post_correo_registrado_error_email(client, monkeypatch):
     monkeypatch.setattr("app.verificarCorreo", lambda email: True)  # Stub
     monkeypatch.setattr("app.obtenerCodigoRecuperacion", lambda email: "ABC123")  # Stub
 
-    def stub_error(email, codigo):
+    def stub_error(self, email, codigo):
         raise Exception("Error de envío")
-    monkeypatch.setattr("app.email.recuperar_contra_notificacion", stub_error)  # Stub
+
+    monkeypatch.setattr(
+        "servicios.notificaciones_servicio.Notificaciones.recuperar_contra_notificacion",
+        stub_error
+    )
 
     # Act & Assert
     with pytest.raises(Exception, match="Error de envío"):

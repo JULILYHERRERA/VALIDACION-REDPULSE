@@ -4,11 +4,11 @@ import smtplib
 from secret_config import NOTIEMAIL, NOTI_APPCONTRA, ADMINEMAIL
 
 
-# 🧠 almacenamiento en memoria
+#  almacenamiento en memoria
 notificaciones_data = {}
 
 
-# 🔔 FUNCIÓN PARA GUARDAR NOTIFICACIONES
+#  FUNCIÓN PARA GUARDAR NOTIFICACIONES
 def agregar_notificacion(correo, mensaje):
     if correo not in notificaciones_data:
         notificaciones_data[correo] = []
@@ -16,7 +16,7 @@ def agregar_notificacion(correo, mensaje):
     notificaciones_data[correo].append(mensaje)
 
 
-# 🔔 FUNCIÓN PARA CONSULTAR NOTIFICACIONES
+#  FUNCIÓN PARA CONSULTAR NOTIFICACIONES
 def obtener_notificaciones(correo):
     return notificaciones_data.get(correo, [])
 
@@ -48,7 +48,7 @@ class Notificaciones:
         server.quit()
 
 
-    # 🔔 DONANTE
+    #  DONANTE
     def parametros_notificacion_donante(self, para_email, tipo_sangre):
         asunto = "¡Tu ayuda es crucial!"
 
@@ -58,14 +58,14 @@ class Notificaciones:
 
         mensaje_corto = f"Escasez de sangre tipo {tipo_sangre}. ¡Dona ahora!"
 
-        # ✅ GUARDAR NOTIFICACIÓN (CLAVE)
+        #  GUARDAR NOTIFICACIÓN (CLAVE)
         agregar_notificacion(para_email, mensaje_corto)
 
-        # 📧 ENVIAR CORREO
+        #  ENVIAR CORREO
         self.enviar_notificacion(para_email, asunto, mensaje)
 
 
-    # 🔔 ADMIN
+    #  ADMIN
     def parametros_notificacion_admin(self, tipo_sangre):
         asunto = f"Niveles de sangre {tipo_sangre} bajos"
         mensaje = (
