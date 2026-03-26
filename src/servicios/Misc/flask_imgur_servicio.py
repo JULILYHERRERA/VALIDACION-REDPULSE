@@ -20,7 +20,7 @@ class Imgur(object):
 
     def init_app(self, app, client_id=None, **kwargs):
         if not client_id and not app.config.get("IMGUR_ID", None):
-            raise Exception("Missing client id")
+            raise ValueError("Missing client id")
         self.client_id = client_id or app.config.get("IMGUR_ID")
         if 'api' in kwargs:
             self.API_URL = kwargs["api"]
@@ -47,7 +47,7 @@ class Imgur(object):
         """
         
         if not image:
-            raise Exception("Missing image object")
+            raise ValueError("Missing image object")
 
         b64 = base64.b64encode(image.read())
 
@@ -82,7 +82,6 @@ class Imgur(object):
             image hash optained when sending an image
             :params additional_headers -- aditional headers to be addd to request
         """
-        opener = urllib.request.build_opener(urllib.request.HTTPHandler)
         req = urllib.request.Request(url = self._get_api() + "/" + delete_hash,
                               headers = self._add_authorization_header(additional_headers))
         req.get_method = lambda: "DELETE"

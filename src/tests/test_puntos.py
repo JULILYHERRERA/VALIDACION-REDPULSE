@@ -58,7 +58,7 @@ def test_prueba3_post_valido_procesa_puntos(client, monkeypatch):
         llamadas.append(puntos)
         return True
 
-    monkeypatch.setattr(modulo, "procesarPuntos", fake_procesar)
+    monkeypatch.setattr(modulo, "procesar_puntos", fake_procesar)
     monkeypatch.setattr(modulo, "obtenerValorUsuarioSesion", lambda clave: 1500)
 
     with client.session_transaction() as sess:
@@ -100,7 +100,7 @@ def test_prueba5_post_valor_invalido_no_deberia_procesarse(client, monkeypatch):
         llamadas.append(puntos)
         return False
 
-    monkeypatch.setattr(modulo, "procesarPuntos", fake_procesar)
+    monkeypatch.setattr(modulo, "procesar_puntos", fake_procesar)
     monkeypatch.setattr(modulo, "obtenerValorUsuarioSesion", lambda clave: 2000)
 
     with client.session_transaction() as sess:
