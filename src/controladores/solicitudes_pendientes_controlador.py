@@ -3,11 +3,10 @@ import sys
 sys.path.append("src")
 
 # Base de datos
-from servicios.BaseDeDatos.usuario_bd_servicio import *
-from servicios.BaseDeDatos.registro_bd_servicio import *
+from servicios.BaseDeDatos.usuario_bd_servicio import obtenerUsuarioPorDocumento, obtenerCorreoDonantesTipoSangreEspecifico
+from servicios.BaseDeDatos.registro_bd_servicio import obtenerUsuarioPorRegistro, obtenerCantidadSangreDonada, agregar_notificacion
 
 #email
-from servicios.notificaciones_servicio import *
 from servicios.notificaciones_servicio import Notificaciones
 email = Notificaciones()
 
