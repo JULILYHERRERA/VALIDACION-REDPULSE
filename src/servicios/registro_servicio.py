@@ -11,6 +11,10 @@ from datetime import datetime
 
 def insertarDonacion(numero_documento, tipo_documento, fecha, cantidad_donada, tipo_registro="Donacion"):
     try:
+        # Validar que la cantidad no sea negativa
+        if cantidad_donada < 0:
+            return False
+
         usuario = obtenerUsuarioPorDocumento(numero_documento, tipo_documento)
 
         if not usuario.donante:

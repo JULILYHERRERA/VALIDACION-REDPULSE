@@ -24,6 +24,12 @@
         </header>
 
         <main class="main-content">
+            {% if donaciones_por_mes == '{}' and sangre_por_tipo == '{}' %}
+            <div class="no-data-message">
+                <p>Actualmente no hay datos disponibles para mostrar las estadísticas.</p>
+            </div>
+            {% endif %}
+            
             <section class="charts">
                 <div class="chart-container">
                     <h2>Donaciones por Mes</h2>

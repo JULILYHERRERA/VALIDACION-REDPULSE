@@ -15,12 +15,8 @@ def _usuario_obtenido_base():
     return {"cedula_usuario": "123456789", "tipo_cedula_usuario": "Cedula de Ciudadania"}
 
 # =====================================================
-# PRUEBA 1 – Sin sesión debería redirigir (debilidad actual en la ruta)
+# PRUEBA 1 – Sin sesión debería redirigir
 # =====================================================
-@pytest.mark.xfail(
-    reason="La ruta /enfermero evalúa user_data.get('admin') aun cuando user_data es None.",
-    strict=True,
-)
 def test_prueba1_sin_sesion_deberia_redirigir_a_home(client):
     # ARRANGE
 
@@ -165,13 +161,8 @@ def test_prueba7_datos_validos_registran_donacion_y_guardan_estado(client, monke
         assert sess["donacion_exitosa"] is True
 
 # =====================================================
-# PRUEBA 8 – Cantidad inválida debería mostrar validación, no error 500
-# (debilidad actual: int(request.form.get(...)) sin manejo)
+# PRUEBA 8 – Cantidad inválida debería mostrar validación
 # =====================================================
-@pytest.mark.xfail(
-    reason="Falta validación backend para cantidad_donada no numérica.",
-    strict=True,
-)
 def test_prueba8_cantidad_invalida_deberia_responder_validacion(client):
     # ARRANGE
     with client.session_transaction() as sess:
@@ -187,16 +178,11 @@ def test_prueba8_cantidad_invalida_deberia_responder_validacion(client):
 
     # ASSERT
     assert resp.status_code == 200
-    assert "validación" in body.lower()
+    assert "número válido" in body.lower()
 
 # =====================================================
 # PRUEBA 9 – Sin usuario verificado debería bloquear registro limpiamente
-# (debilidad actual: acceso directo a user_obtained_data['cedula_usuario'])
 # =====================================================
-@pytest.mark.xfail(
-    reason="No hay guard clause cuando falta `enfermero_usuario_obtenido` en sesión.",
-    strict=True,
-)
 def test_prueba9_sin_usuario_verificado_deberia_bloquear_registro_limpiamente(client):
     # ARRANGE
     with client.session_transaction() as sess:
@@ -214,13 +200,8 @@ def test_prueba9_sin_usuario_verificado_deberia_bloquear_registro_limpiamente(cl
 
 # =====================================================
 # PRUEBA 10 – Campos vacíos no deberían consultar existencia en backend
-# (debilidad actual: se consulta aun con valores vacíos)
 # STUB + SPY
 # =====================================================
-@pytest.mark.xfail(
-    reason="Falta validación backend en /enfermero para campos obligatorios vacíos.",
-    strict=True,
-)
 def test_prueba10_campos_vacios_no_deberian_consultar_existencia(client, monkeypatch):
     # ARRANGE
     llamadas = []
@@ -242,4 +223,3 @@ def test_prueba10_campos_vacios_no_deberian_consultar_existencia(client, monkeyp
     # ASSERT
     assert resp.status_code == 200
     assert llamadas == []
-

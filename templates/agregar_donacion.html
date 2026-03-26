@@ -29,6 +29,11 @@
             </section>
 
             <!-- Formulario de donación -->
+            {% if session.mensaje_validacion_donacion %}
+            <div class="alert alert-danger">
+                <p>{{ session.mensaje_validacion_donacion }}</p>
+            </div>
+            {% endif %}
             <form class="donation-form" method="POST">
                 <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                 <label for="quantity">Cantidad Donada (ml)</label>

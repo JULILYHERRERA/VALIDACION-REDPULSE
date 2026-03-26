@@ -66,9 +66,15 @@
     </div>
 
     <!-- Modal de error -->
-    <div id="error-message" {% if session.registarse_verificacion_resultado == True %}class="active"{% endif %}>
+    <div id="error-message" {% if session.registarse_verificacion_resultado == True or session.correo_ya_existe == True %}class="active"{% endif %}>
         <div class="error-content">
-            <h2>¡La cuenta ya existe ó el correo ya esta siendo utilizado!</h2>
+            {% if session.registarse_verificacion_resultado == True %}
+                <h2>¡La cuenta con este documento ya existe!</h2>
+            {% elif session.correo_ya_existe == True %}
+                <h2>¡El correo ya está siendo utilizado por otra cuenta!</h2>
+            {% else %}
+                <h2>¡Error al crear la cuenta!</h2>
+            {% endif %}
             <button onclick="closeErrorMessage()">Cerrar</button>
         </div>
     </div>

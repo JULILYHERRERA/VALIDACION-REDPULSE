@@ -3,11 +3,11 @@ import sys
 sys.path.append("src")
 
 # Base de datos
-from servicios.BaseDeDatos.usuario_bd_servicio import obtenerUsuarioPorDocumento, obtenerCorreosDonantesTipoSangreEspecifico
+from servicios.BaseDeDatos.usuario_bd_servicio import obtenerUsuarioPorDocumento, obtenerCorreosDonantesTipoSangreEspecifico, obtenerCorreoUsuario
 from servicios.BaseDeDatos.registro_bd_servicio import obtenerUsuarioPorRegistro, obtenerCantidadSangreDonada
 
-#email
-from servicios.notificaciones_servicio import Notificaciones
+# email
+from servicios.notificaciones_servicio import Notificaciones, agregar_notificacion
 email = Notificaciones()
 
 CNT_SANGRE_MINIMA = 1000

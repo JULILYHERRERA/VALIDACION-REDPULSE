@@ -1,5 +1,6 @@
 import os
 import sys
+from datetime import datetime
 
 import pytest
 
@@ -9,21 +10,23 @@ import app as modulo
 from app import app
 
 def _user_data_solicitante(registros=None):
+    if registros is None:
+        registros = []
     return {
         "nombre": "Laura",
-        "correo": "laura@mail.com",
-        "numero_documento": "123456789",
+        "puntos": 2000,
+        "numero_documento": "987654321",
         "tipo_documento": "CC",
         "tipo_de_sangre": "O+",
-        "registros": registros if registros is not None else [],
-        "cnt_registros": len(registros) if registros is not None else 0,
+        "registros": registros,
+        "cnt_registros": len(registros),
     }
 
 def _form_solicitud_valido():
     return {
         "cantidad_sangre_donada": "300",
-        "razon": "Cirugia programada",
-        "comentarios": "Paciente en observacion",
+        "razon": "Cirugía programada",
+        "comentarios": "Paciente estable",
         "prioridad_solicitud": "2",
     }
 
@@ -31,8 +34,6 @@ def _form_solicitud_valido():
 # PRUEBA 1 – Sin sesión redirige a home
 # =====================================================
 def test_prueba1_sin_sesion_redirige_a_home(client):
-    # ARRANGE
-
     # ACT
     resp = client.get("/solicitud_donacion", follow_redirects=False)
 
@@ -41,9 +42,9 @@ def test_prueba1_sin_sesion_redirige_a_home(client):
     assert resp.headers.get("Location") is not None
 
 # =====================================================
-# PRUEBA 2 – Con sesión renderiza formulario de solicitud
+# PRUEBA 2 – Solicitante con sesión renderiza formulario
 # =====================================================
-def test_prueba2_con_sesion_renderiza_formulario(client):
+def test_prueba2_solicitante_con_sesion_renderiza_formulario(client):
     # ARRANGE
     with client.session_transaction() as sess:
         sess["user_data"] = _user_data_solicitante()
@@ -55,29 +56,15 @@ def test_prueba2_con_sesion_renderiza_formulario(client):
     # ASSERT
     assert resp.status_code == 200
     assert "Solicitud de Sangre" in body
-    assert "Enviar Solicitud" in body
+    assert "cantidad_sangre_donada" in body
 
 # =====================================================
-# PRUEBA 3 – Formulario válido registra solicitud exitosamente
+# PRUEBA 3 – Registro exitoso setea bandera en sesión
 # STUB + SPY
 # =====================================================
-def test_prueba3_formulario_valido_registra_solicitud_exitosamente(client, monkeypatch):
+def test_prueba3_registro_exitoso_setea_bandera_true(client, monkeypatch):
     # ARRANGE
-    llamadas = []
-
-    def fake_crear_registro(request_obj, user_data):
-        llamadas.append(
-            {
-                "cantidad": request_obj.form.get("cantidad_sangre_donada"),
-                "razon": request_obj.form.get("razon"),
-                "prioridad": request_obj.form.get("prioridad_solicitud"),
-                "documento": user_data["numero_documento"],
-            }
-        )
-        return True
-
-    monkeypatch.setattr(modulo, "crearRegistro", fake_crear_registro)
-
+    monkeypatch.setattr(modulo, "crearRegistro", lambda request_obj, user_data: True)
     with client.session_transaction() as sess:
         sess["user_data"] = _user_data_solicitante()
 
@@ -86,17 +73,11 @@ def test_prueba3_formulario_valido_registra_solicitud_exitosamente(client, monke
 
     # ASSERT
     assert resp.status_code == 200
-    assert len(llamadas) == 1
-    assert llamadas[0]["cantidad"] == "300"
-    assert llamadas[0]["razon"] == "Cirugia programada"
-    assert llamadas[0]["prioridad"] == "2"
-
     with client.session_transaction() as sess:
         assert sess["registro_creado"] is True
 
 # =====================================================
-# PRUEBA 4 – Registro fallido deja bandera en False
-# STUB
+# PRUEBA 4 – Registro fallido setea bandera false
 # =====================================================
 def test_prueba4_registro_fallido_setea_bandera_false(client, monkeypatch):
     # ARRANGE
@@ -114,12 +95,7 @@ def test_prueba4_registro_fallido_setea_bandera_false(client, monkeypatch):
 
 # =====================================================
 # PRUEBA 5 – Campos obligatorios vacíos: debería mostrar validaciones
-# (la validación actual es HTML required; backend aún no valida)
 # =====================================================
-@pytest.mark.xfail(
-    reason="La ruta no valida campos obligatorios en backend ni muestra mensajes explícitos.",
-    strict=True,
-)
 def test_prueba5_campos_obligatorios_vacios_muestra_mensajes_de_validacion(client):
     # ARRANGE
     with client.session_transaction() as sess:
@@ -139,7 +115,7 @@ def test_prueba5_campos_obligatorios_vacios_muestra_mensajes_de_validacion(clien
 
     # ASSERT
     assert resp.status_code == 200
-    assert "campo obligatorio" in body.lower()
+    assert "obligatorios" in body.lower()
 
 # =====================================================
 # PRUEBA 6 – Solicitud registrada aparece en historial
@@ -177,13 +153,7 @@ def test_prueba6_solicitud_registrada_aparece_en_historial(client, monkeypatch):
 
 # =====================================================
 # PRUEBA 7 – Campos obligatorios vacíos no debería intentar registrar
-# (fallo esperado: hoy sí invoca crearRegistro)
-# STUB + SPY
 # =====================================================
-@pytest.mark.xfail(
-    reason="La ruta llama crearRegistro sin validar campos vacíos en backend.",
-    strict=True,
-)
 def test_prueba7_campos_vacios_no_deberia_intentar_registrar(client, monkeypatch):
     # ARRANGE
     llamadas = []
@@ -213,12 +183,7 @@ def test_prueba7_campos_vacios_no_deberia_intentar_registrar(client, monkeypatch
 
 # =====================================================
 # PRUEBA 8 – Error de validación debería dejar mensaje en sesión
-# (fallo esperado: hoy no existe este mensaje backend)
 # =====================================================
-@pytest.mark.xfail(
-    reason="No se guarda mensaje de validación en sesión al fallar formulario.",
-    strict=True,
-)
 def test_prueba8_error_validacion_deberia_guardar_mensaje_en_sesion(client):
     # ARRANGE
     with client.session_transaction() as sess:

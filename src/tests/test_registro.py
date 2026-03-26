@@ -101,7 +101,9 @@ def test_prueba4_correo_ya_existente(client, monkeypatch):
     # ASSERT
     assert resp.status_code == 200
     with client.session_transaction() as sess:
-        assert sess.get("registarse_verificacion_resultado") is True
+        # Verificamos que la bandera de error sea True (Existe)
+        assert sess.get("registarse_verificacion_resultado") is False
+        assert sess.get("correo_ya_existe") is True
         assert "user_data" not in sess
 
 # =====================================================

@@ -34,6 +34,11 @@
             </section>
 
             <section class="request-form">
+                {% if session.mensaje_validacion %}
+                <div class="alert alert-danger">
+                    <p>{{ session.mensaje_validacion }}</p>
+                </div>
+                {% endif %}
 
                 <form method="post">
                     <meta name="csrf-token" content="{{ csrf_token() }}">

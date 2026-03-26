@@ -6,15 +6,18 @@ import secret_config
 
 from flask import Flask, render_template, request, redirect, url_for, session, jsonify
 from flask_wtf.csrf import CSRFProtect
-#Imgur
+# Imgur
 from servicios.Misc.flask_imgur_servicio import Imgur
+
+# Servicios de usuario e imagen
+from servicios.sesion_servicio import generarUsuarioSesion, generarUsuarioImagen, obtenerValorUsuarioSesion
 
 #Misc
 import os
 import secrets  # Agregado para generación de tokens
 
 # Controlador para el login y registro
-from controladores.aunteticacion_controlador import obtenerValoresUsuario,verificarUsuario,registrarUsuario,verificacionLogin
+from controladores.aunteticacion_controlador import obtenerValoresUsuario,verificarUsuario,registrarUsuario,verificacionLogin, verificarExistenciaUsuario
 
 # Controlador de puntos
 from controladores.puntos_controlador import procesar_puntos
@@ -24,7 +27,7 @@ from servicios.sesion_servicio import obtenerValorUsuarioSesion
 from controladores.solicitudes_pendientes_controlador import verificarNivelesDeSangre
 
 # Base de datos
-from servicios.BaseDeDatos.usuario_bd_servicio import obtenerUsuarioPorDocumento, actualizarPuntos, actualizarEstadoEnfermero, obtenerTodosUsuariosNoAdmin, eliminarUsuario, actualizar_imagen_usuario
+from servicios.BaseDeDatos.usuario_bd_servicio import obtenerUsuarioPorDocumento, actualizarPuntos, actualizarEstadoEnfermero, obtenerTodosUsuariosNoAdmin, eliminarUsuario, actualizar_imagen_usuario, verificarCorreo, verificarExistenciaUsuario
 from servicios.BaseDeDatos.registro_bd_servicio import obtenerDonacionesPorMes, obtenerCantidadDeSangrePorTipo, actualizarEstadoRegistro, obtenerSolicitudesPendientes
 
 
@@ -257,6 +260,19 @@ def solicitud_donacion():
        return redirect(url_for('home'))
     
     if request.method == 'POST':
+        # Validar campos obligatorios en el backend
+        cantidad = request.form.get('cantidad_sangre_donada')
+        razon = request.form.get('razon')
+        prioridad = request.form.get('prioridad_solicitud')
+
+        if not all([cantidad, razon, prioridad]):
+            session['registro_creado'] = False
+            session['mensaje_validacion'] = "Todos los campos marcados con * son obligatorios."
+            return render_template('solicitud_donacion.html', user_data=user_data)
+
+        # Si pasa la validación, limpiar mensaje anterior
+        session.pop('mensaje_validacion', None)
+
         # Crear el registro en el sistema.
         registro_creado = crearRegistro(request, user_data)
 
@@ -285,12 +301,19 @@ def solicitudes_pendientes():
         csrf.protect()
         
         data = request.get_json()
+        if not data or 'id' not in data or 'accion' not in data or 'tipo_sangre' not in data:
+            return jsonify(success=False, error="Datos incompletos"), 400
+            
         solicitud_id = data.get('id')
         accion = data.get('accion')
         tipo_sangre_solicitud = data.get('tipo_sangre')
 
+        if not isinstance(solicitud_id, int) or solicitud_id < 0:
+            return jsonify(success=False, error="ID inválido"), 400
+
         actualizarEstadoRegistro(solicitud_id, accion)
         verificarNivelesDeSangre(solicitud_id, accion, tipo_sangre_solicitud)
+        return jsonify(success=True)
 
     return render_template('solicitudes_pendientes.html', solicitudes_pendientes=json.dumps(solicitudes))
 
@@ -415,12 +438,15 @@ def enfermero():
     
     # Verificar si el usuario ha iniciado sesión
     if not user_data or not user_data.get('enfermero'):
-        if user_data.get('admin'):
-            return redirect(url_for('home'))
+        return redirect(url_for('home'))
 
     if request.method == 'POST':
         cedula_ingresada = request.form.get('cedula')
         tipo_de_cedula_ingresada = request.form.get('tipo_documento')
+
+        if not cedula_ingresada or not tipo_de_cedula_ingresada:
+            session['enfermero_usuario_verificacion'] = None
+            return render_template('enfermero.html', nombre_enfermero = user_data['nombre'])
 
         # Verificar si la cuenta ya existe
         exists = verificarExistenciaUsuario(cedula_ingresada, tipo_de_cedula_ingresada)
@@ -457,13 +483,28 @@ def agregar_donacion():
     session['enfermero_usuario_verificacion'] = None
 
     if request.method == 'POST':
-        cantidad_sangre_donada = int(request.form.get('cantidad_donada'))
+        cantidad_sangre_donada_raw = request.form.get('cantidad_donada')
         fecha_donacion = request.form.get('fecha_donacion')
+        
+        if not cantidad_sangre_donada_raw or not fecha_donacion:
+            session['mensaje_validacion_donacion'] = "Todos los campos son obligatorios."
+            return render_template('agregar_donacion.html')
+
+        try:
+            cantidad_sangre_donada = int(cantidad_sangre_donada_raw)
+        except (ValueError, TypeError):
+            session['mensaje_validacion_donacion'] = "La cantidad debe ser un número válido."
+            return render_template('agregar_donacion.html')
+
+        if not user_obtained_data or 'cedula_usuario' not in user_obtained_data:
+            return redirect(url_for('enfermero'))
+
         numero_documento = user_obtained_data['cedula_usuario']
         tipo_documento = user_obtained_data['tipo_cedula_usuario']
 
         donacion_exitosa = insertarDonacion(numero_documento, tipo_documento, fecha_donacion, cantidad_sangre_donada)
         session['donacion_exitosa'] = donacion_exitosa
+        session.pop('mensaje_validacion_donacion', None)
 
     return render_template('agregar_donacion.html')
 
@@ -517,7 +558,8 @@ def registro():
         correo_existe = verificarCorreo(usuario.correo)
 
         # Almacenar el resultado de la verificación en la sesión
-        session['registarse_verificacion_resultado'] = True
+        session['registarse_verificacion_resultado'] = exists
+        session['correo_ya_existe'] = correo_existe
 
         # Crear el usuario en el sistema.
         if not exists and not correo_existe:
@@ -625,9 +667,16 @@ def chatbot_donante():
         return render_template('chatbot.html', user_data=user_data, rol_chat="DONANTE")
 
     data = request.get_json()
-    mensaje = data.get("mensaje_ingresado")
-    respuesta = generate_response(mensaje, user_data, rol_forzado="DONANTE")
-    return jsonify(respuesta=respuesta)
+    mensaje = data.get("mensaje_ingresado") if data else None
+    
+    if not mensaje:
+        return jsonify(respuesta="Por favor, ingresa un mensaje válido."), 400
+
+    try:
+        respuesta = generate_response(mensaje, user_data, rol_forzado="DONANTE")
+        return jsonify(respuesta=respuesta)
+    except Exception:
+        return jsonify(respuesta="Lo siento, tengo problemas técnicos con mi servicio de IA. Intenta más tarde."), 200
 
 
 @app.route('/chatbot_solicitante', methods=['GET'])
@@ -647,9 +696,16 @@ def chatbot_solicitante():
         return render_template('chatbot.html', user_data=user_data, rol_chat="SOLICITANTE")
 
     data = request.get_json()
-    mensaje = data.get("mensaje_ingresado")
-    respuesta = generate_response(mensaje, user_data, rol_forzado="SOLICITANTE")
-    return jsonify(respuesta=respuesta)
+    mensaje = data.get("mensaje_ingresado") if data else None
+    
+    if not mensaje:
+        return jsonify(respuesta="Por favor, ingresa un mensaje válido."), 400
+
+    try:
+        respuesta = generate_response(mensaje, user_data, rol_forzado="SOLICITANTE")
+        return jsonify(respuesta=respuesta)
+    except Exception:
+        return jsonify(respuesta="Lo siento, tengo problemas técnicos con mi servicio de IA. Intenta más tarde."), 200
 
 
 @app.route('/filtrar_solicitudes', methods=['GET'])

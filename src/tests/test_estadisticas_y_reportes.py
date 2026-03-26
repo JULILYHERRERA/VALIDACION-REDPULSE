@@ -139,12 +139,7 @@ def test_prueba5_reporte_mensual_refleja_datos_en_pagina(client, monkeypatch):
 
 # =====================================================
 # PRUEBA 6 – HU29: sin datos debería mostrar mensaje informativo
-# (punto débil: la plantilla solo renderiza canvas vacíos)
 # =====================================================
-@pytest.mark.xfail(
-    reason="estadisticas.html no muestra mensaje cuando donaciones/sangre están vacíos.",
-    strict=True,
-)
 def test_prueba6_sin_datos_muestra_mensaje_informativo(client, monkeypatch):
     # ARRANGE
     monkeypatch.setattr(modulo, "obtenerDonacionesPorMes", lambda: {})
