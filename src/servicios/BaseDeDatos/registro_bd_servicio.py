@@ -38,7 +38,7 @@ def crearTabla():
     try:
         cursor.execute( sql )
         cursor.connection.commit()
-    except:
+    except Exception:
         # SI LLEGA AQUI, ES PORQUE LA TABLA YA EXISTE
         cursor.connection.rollback()
 
@@ -67,7 +67,7 @@ def insertarEnTabla( registro ):
     except Exception as e:
         print(e)
         cursor.connection.rollback() 
-        raise Exception("No fue posible insertar el registro." )
+        raise ValueError("No fue posible insertar el registro." )
     
 def actualizarEstadoRegistro( registro_id, estado ):
     """ Agrega una cantidad de puntos al usuario especificado """
@@ -79,7 +79,7 @@ def actualizarEstadoRegistro( registro_id, estado ):
         cursor.connection.commit()
     except Exception as e:
         cursor.connection.rollback()
-        raise Exception("No fue posible actualizar el estado del registro: ") from e
+        raise ValueError("No fue posible actualizar el estado del registro: ") from e
     
 def obtenerUsuarioRegistros( numero_documento , tipo_documento ):
     """ Obtiene todas los registros que sean solicitud y tengan estado pendiente """
@@ -224,5 +224,5 @@ def obtenerCantidadSangreDonada(tipo_sangre):
         
         return cantidad_total
     except Exception as e:
-        raise Exception(f"No fue posible obtener la cantidad total de sangre donada para el tipo de sangre {tipo_sangre}") from e
+        raise ValueError(f"No fue posible obtener la cantidad total de sangre donada para el tipo de sangre {tipo_sangre}") from e
 

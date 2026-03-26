@@ -17,7 +17,7 @@ import secrets  # Agregado para generación de tokens
 from controladores.aunteticacion_controlador import obtenerValoresUsuario,verificarUsuario,registrarUsuario,verificacionLogin
 
 # Controlador de puntos
-from controladores.puntos_controlador import procesarPuntos
+from controladores.puntos_controlador import procesar_puntos
 
 # Controlador de solicitudes pendientes
 from controladores.solicitudes_pendientes_controlador import verificarNivelesDeSangre
