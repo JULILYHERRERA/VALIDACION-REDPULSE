@@ -86,7 +86,6 @@ def test_chatbot_error_ia(client, monkeypatch):
     with client.session_transaction() as sess:
         sess["user_data"] = {"nombre": "Ana", "donante": True}
 
-    # CORRECCIÓN: Agregamos **kwargs para capturar 'rol_forzado'
     def mock_fallo(*args, **kwargs):
         raise Exception("Servicio de IA no disponible")
     

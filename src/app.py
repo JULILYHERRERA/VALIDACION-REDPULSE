@@ -483,7 +483,9 @@ def enfermero():
             }
         
     return render_template('enfermero.html', nombre_enfermero = user_data['nombre'])
-    
+
+
+#maneji de metodos HTTP     
 @app.route('/agregar_donacion', methods=['GET'])
 @app.route('/agregar_donacion', methods=['POST'])
 def agregar_donacion():
@@ -492,20 +494,22 @@ def agregar_donacion():
     user_obtained_data = session.get('enfermero_usuario_obtenido')
     
     # Verificar si el usuario ha iniciado sesión
-    if not user_data or not user_data.get('enfermero'):
+    if not user_data or not user_data.get('enfermero'): #verifico el rol de enfermero , asi protegemos la ruta
         return redirect(url_for('home'))
 
-    session['enfermero_usuario_verificacion'] = None
+    session['enfermero_usuario_verificacion'] = None #reincia estados
 
     if request.method == 'POST':
         cantidad_sangre_donada_raw = request.form.get('cantidad_donada')
         fecha_donacion = request.form.get('fecha_donacion')
         
+        #validacion de campos obligatorios
         if not cantidad_sangre_donada_raw or not fecha_donacion:
             session['mensaje_validacion_donacion'] = "Todos los campos son obligatorios."
             return render_template('agregar_donacion.html')
 
-        try:
+
+        try:  #validacion de tipo de dato
             cantidad_sangre_donada = int(cantidad_sangre_donada_raw)
         except (ValueError, TypeError):
             session['mensaje_validacion_donacion'] = "La cantidad debe ser un número válido."
@@ -751,4 +755,4 @@ def filtrar_solicitudes():
 
 
 if __name__ == '__main__':
-    app.run(debug=False) # debug=True --> cuando se use localmente
+    app.run(host="0.0.0.0", port=8000, debug=False)
