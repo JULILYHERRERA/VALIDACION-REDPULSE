@@ -20,28 +20,28 @@ pipeline {
             }
         }
 
-    stage('Run Tests with Coverage') {
-        steps {
-            sh '''
-            docker rm -f redpulse-ci || true
+        stage('Run Tests with Coverage') {
+            steps {
+                sh '''
+                docker rm -f redpulse-ci || true
 
-            docker run -d --name redpulse-ci python:3.11-slim tail -f /dev/null
+                docker run -d --name redpulse-ci python:3.11-slim tail -f /dev/null
 
-            docker cp . redpulse-ci:/app
+                docker cp . redpulse-ci:/app
 
-            docker exec redpulse-ci sh -lc "
-                cd /app &&
-                pip install --upgrade pip &&
-                pip install -r requirements.txt &&
-                pytest --cov=src --cov-report=xml --cov-report=term-missing
-            "
+                docker exec redpulse-ci sh -lc "
+                    cd /app &&
+                    pip install --upgrade pip &&
+                    pip install -r requirements.txt &&
+                    pytest --cov=src --cov-report=xml --cov-report=term-missing
+                "
 
-            docker cp redpulse-ci:/app/coverage.xml coverage.xml
+                docker cp redpulse-ci:/app/coverage.xml coverage.xml
 
-            docker rm -f redpulse-ci
-            '''
+                docker rm -f redpulse-ci
+                '''
+            }
         }
-    }
 
         stage('SonarQube Analysis') {
             steps {
@@ -50,14 +50,14 @@ pipeline {
                     withSonarQubeEnv('SonarQube') {
                         sh """
                         ${scannerHome}/bin/sonar-scanner \
-                          -Dsonar.projectKey=${SONAR_PROJECT_KEY} \
-                          -Dsonar.projectName="${SONAR_PROJECT_NAME}" \
-                          -Dsonar.sources=src \
-                          -Dsonar.tests=src/tests \
-                          -Dsonar.python.version=3.11 \
-                          -Dsonar.python.coverage.reportPaths=coverage.xml \
-                          -Dsonar.exclusions=src/secret_config.py \
-                          -Dsonar.sourceEncoding=UTF-8
+                        -Dsonar.projectKey=${SONAR_PROJECT_KEY} \
+                        -Dsonar.projectName="${SONAR_PROJECT_NAME}" \
+                        -Dsonar.sources=src \
+                        -Dsonar.tests=src/tests \
+                        -Dsonar.exclusions=src/tests/**,src/secret_config.py \
+                        -Dsonar.python.version=3.11 \
+                        -Dsonar.python.coverage.reportPaths=coverage.xml \
+                        -Dsonar.sourceEncoding=UTF-8
                         """
                     }
                 }
