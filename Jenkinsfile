@@ -53,7 +53,7 @@ pipeline {
                           -Dsonar.projectKey=${SONAR_PROJECT_KEY} \
                           -Dsonar.projectName="${SONAR_PROJECT_NAME}" \
                           -Dsonar.sources=src \
-                          -Dsonar.tests=tests \
+                          -Dsonar.tests=src/tests \
                           -Dsonar.python.version=3.11 \
                           -Dsonar.python.coverage.reportPaths=coverage.xml \
                           -Dsonar.exclusions=src/secret_config.py \
