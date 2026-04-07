@@ -20,6 +20,17 @@ pipeline {
             }
         }
 
+        stage('Debug Workspace') {
+            steps {
+                sh '''
+                echo "PWD=$PWD"
+                ls -la
+                echo "Archivos del workspace:"
+                find . -maxdepth 3 -type f | sort
+                '''
+            }
+        }
+
         stage('Run Tests with Coverage') {
             steps {
                 sh '''
