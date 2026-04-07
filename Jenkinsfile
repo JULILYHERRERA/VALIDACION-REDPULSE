@@ -49,15 +49,7 @@ pipeline {
                     def scannerHome = tool name: 'SonarScanner', type: 'hudson.plugins.sonar.SonarRunnerInstallation'
                     withSonarQubeEnv('SonarQube') {
                         sh """
-                        ${scannerHome}/bin/sonar-scanner \
-                        -Dsonar.projectKey=${SONAR_PROJECT_KEY} \
-                        -Dsonar.projectName="${SONAR_PROJECT_NAME}" \
-                        -Dsonar.sources=src \
-                        -Dsonar.tests=src/tests \
-                        -Dsonar.exclusions=src/tests/**,src/secret_config.py \
-                        -Dsonar.python.version=3.11 \
-                        -Dsonar.python.coverage.reportPaths=coverage.xml \
-                        -Dsonar.sourceEncoding=UTF-8
+                        ${scannerHome}/bin/sonar-scanner
                         """
                     }
                 }
