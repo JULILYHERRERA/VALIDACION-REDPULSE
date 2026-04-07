@@ -20,28 +20,28 @@ pipeline {
             }
         }
 
-        stage('Debug Workspace') {
-            steps {
-                sh '''
-                echo "PWD=$PWD"
-                ls -la
-                echo "Archivos del workspace:"
-                find . -maxdepth 3 -type f | sort
-                '''
-            }
-        }
+    stage('Run Tests with Coverage') {
+        steps {
+            sh '''
+            docker rm -f redpulse-ci || true
 
-        stage('Run Tests with Coverage') {
-            steps {
-                sh '''
-                docker run --rm \
-                  -v "$PWD:/app" \
-                  -w /app \
-                  python:3.11-slim \
-                  sh -lc "pip install --upgrade pip && pip install -r requirements.txt && pytest"
-                '''
-            }
+            docker run -d --name redpulse-ci python:3.11-slim tail -f /dev/null
+
+            docker cp . redpulse-ci:/app
+
+            docker exec redpulse-ci sh -lc "
+                cd /app &&
+                pip install --upgrade pip &&
+                pip install -r requirements.txt &&
+                pytest --cov=src --cov-report=xml --cov-report=term-missing
+            "
+
+            docker cp redpulse-ci:/app/coverage.xml coverage.xml
+
+            docker rm -f redpulse-ci
+            '''
         }
+    }
 
         stage('SonarQube Analysis') {
             steps {
