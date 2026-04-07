@@ -1,6 +1,10 @@
 pipeline {
     agent any
 
+    options {
+        skipDefaultCheckout(true)
+    }
+
     environment {
         VENV_DIR = '.venv'
         IMAGE_NAME = 'redpulse-app'
@@ -16,22 +20,14 @@ pipeline {
             }
         }
 
-        stage('Install Dependencies') {
-            steps {
-                sh '''
-                python3 -m venv $VENV_DIR
-                . $VENV_DIR/bin/activate
-                python -m pip install --upgrade pip
-                pip install -r requirements.txt
-                '''
-            }
-        }
-
         stage('Run Tests with Coverage') {
             steps {
                 sh '''
-                . $VENV_DIR/bin/activate
-                pytest
+                docker run --rm \
+                  -v "$PWD:/app" \
+                  -w /app \
+                  python:3.11-slim \
+                  sh -lc "pip install --upgrade pip && pip install -r requirements.txt && pytest"
                 '''
             }
         }
@@ -42,7 +38,6 @@ pipeline {
                     def scannerHome = tool name: 'SonarScanner', type: 'hudson.plugins.sonar.SonarRunnerInstallation'
                     withSonarQubeEnv('SonarQube') {
                         sh """
-                        . ${VENV_DIR}/bin/activate
                         ${scannerHome}/bin/sonar-scanner \
                           -Dsonar.projectKey=${SONAR_PROJECT_KEY} \
                           -Dsonar.projectName="${SONAR_PROJECT_NAME}" \
