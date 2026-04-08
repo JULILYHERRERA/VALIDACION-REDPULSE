@@ -33,7 +33,7 @@ pipeline {
                     cd /app &&
                     pip install --upgrade pip &&
                     pip install -r requirements.txt &&
-                    pytest --cov=src --cov-report=xml --cov-report=term-missing
+                    pytest --cov --cov-report=xml --cov-report=term-missing
                 "
 
                 docker cp redpulse-ci:/app/coverage.xml coverage.xml
