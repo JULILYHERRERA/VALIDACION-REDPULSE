@@ -130,5 +130,5 @@ def test_prueba5_post_sin_usuario_obtenido_no_deberia_procesarse(client, monkeyp
     })
 
     # ASSERT
-    assert resp.status_code == 200
+    assert resp.status_code == 302
     assert llamadas == []
