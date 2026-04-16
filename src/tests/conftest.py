@@ -68,9 +68,10 @@ def client():
         _post_original = c.post
 
         def post_con_csrf(path, **kwargs):
+            headers = dict(kwargs.pop("headers", None) or {})
+
             if "json" in kwargs:
                 # Petición JSON: token en cabecera X-CSRFToken
-                headers = dict(kwargs.pop("headers", None) or {})
                 headers.setdefault("X-CSRFToken", token)
                 kwargs["headers"] = headers
             elif "data" in kwargs:
@@ -79,6 +80,13 @@ def client():
                     datos = dict(kwargs["data"])
                     datos.setdefault("csrf_token", token)
                     kwargs["data"] = datos
+                if headers:
+                    kwargs["headers"] = headers
+            else:
+                # POST sin body: enviamos el token por cabecera para que
+                # la protección CSRF no bloquee el caso que se quiere probar.
+                headers.setdefault("X-CSRFToken", token)
+                kwargs["headers"] = headers
             return _post_original(path, **kwargs)
 
         c.post = post_con_csrf
