@@ -27,7 +27,7 @@ from servicios.sesion_servicio import obtenerValorUsuarioSesion
 from controladores.solicitudes_pendientes_controlador import verificarNivelesDeSangre
 
 # Base de datos
-from servicios.BaseDeDatos.usuario_bd_servicio import obtenerUsuarioPorDocumento, actualizarPuntos, actualizarEstadoEnfermero, obtenerTodosUsuariosNoAdmin, eliminarUsuario, actualizar_imagen_usuario, verificarCorreo, verificarExistenciaUsuario, obtenerCodigoRecuperacion, actualizarContrasena
+from servicios.BaseDeDatos.usuario_bd_servicio import obtenerUsuarioPorDocumento, actualizarPuntos, actualizarEstadoEnfermero, obtenerTodosUsuariosNoAdmin, eliminarUsuario, actualizar_imagen_usuario, verificarCorreo, verificarExistenciaUsuario, obtenerCodigoRecuperacion, actualizarContrasena, obtenerSolicitudesPendientesPorTipo
 from servicios.BaseDeDatos.registro_bd_servicio import obtenerDonacionesPorMes, obtenerCantidadDeSangrePorTipo, actualizarEstadoRegistro, obtenerSolicitudesPendientes
 
 
@@ -186,22 +186,32 @@ def movimientos():
     if not user_data:
        return redirect(url_for('home'))
 
-    # Validaciones defensivas para evitar renderizar datos inconsistentes
+    # Normalizamos la estructura para que la vista pueda renderizar
+    # historiales vacios o registros incompletos sin devolver 500/redirect.
     if not isinstance(user_data, dict):
-        return redirect(url_for('home'))
+        user_data = {}
 
     registros = user_data.get('registros')
-    if not isinstance(registros, list) or len(registros) == 0:
-        return redirect(url_for('home'))
+    if not isinstance(registros, list):
+        registros = []
 
-    campos_requeridos = {"TIPO_REGISTRO", "FECHA", "CANTIDAD", "PRIORIDAD", "ESTADO"}
+    registros_normalizados = []
     for registro in registros:
         if not isinstance(registro, dict):
-            return redirect(url_for('home'))
-        if not campos_requeridos.issubset(registro.keys()):
-            return redirect(url_for('home'))
+            continue
 
-    return render_template('movimientos.html', user_data=user_data)
+        registros_normalizados.append({
+            "TIPO_REGISTRO": registro.get("TIPO_REGISTRO") or "solicitud",
+            "FECHA": registro.get("FECHA") or "fecha no disponible",
+            "CANTIDAD": registro.get("CANTIDAD") if registro.get("CANTIDAD") is not None else 0,
+            "PRIORIDAD": registro.get("PRIORIDAD") or "",
+            "ESTADO": registro.get("ESTADO") or "",
+        })
+
+    user_data_normalizado = dict(user_data)
+    user_data_normalizado["registros"] = registros_normalizados
+
+    return render_template('movimientos.html', user_data=user_data_normalizado)
 
 @app.route('/puntos', methods=['GET'])
 @app.route('/puntos', methods=['POST'])
@@ -685,11 +695,11 @@ def chatbot_donante():
     if request.method == 'GET':
         return render_template('chatbot.html', user_data=user_data, rol_chat="DONANTE")
 
-    data = request.get_json()
+    data = request.get_json(silent=True)
     mensaje = data.get("mensaje_ingresado") if data else None
     
     if not mensaje:
-        return jsonify(respuesta="Por favor, ingresa un mensaje válido."), 400
+        return jsonify(respuesta="Por favor, ingresa un mensaje válido."), 200
 
     try:
         respuesta = generate_response(mensaje, user_data, rol_forzado="DONANTE")
@@ -714,11 +724,11 @@ def chatbot_solicitante():
     if request.method == 'GET':
         return render_template('chatbot.html', user_data=user_data, rol_chat="SOLICITANTE")
 
-    data = request.get_json()
+    data = request.get_json(silent=True) if request.is_json else {}
     mensaje = data.get("mensaje_ingresado") if data else None
     
     if not mensaje:
-        return jsonify(respuesta="Por favor, ingresa un mensaje válido."), 400
+        return jsonify(respuesta="Por favor, ingresa un mensaje válido."), 200
 
     try:
         respuesta = generate_response(mensaje, user_data, rol_forzado="SOLICITANTE")
