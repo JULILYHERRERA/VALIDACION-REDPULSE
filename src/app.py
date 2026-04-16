@@ -65,45 +65,20 @@ imgur_handler = Imgur(app)
 
 #////////////////////////////// Funciones //////////////////////////////////////////////
 
-def _normalize_user_data(user_data, test_mode):
-    """
-    Normalize user_data for the movimientos view.
-    Returns (normalized_data, None) on success, or (None, redirect_response)
-    when test_mode is active and data is invalid.
-    """
-    # 1. Validate user_data is a dict
+def _normalize_tolerant(user_data):
+    """Always returns normalized user_data (never redirects)."""
     if not isinstance(user_data, dict):
-        if test_mode:
-            return None, redirect(url_for('home'))
         user_data = {}
 
-    # 2. Validate registros is a list
     registros = user_data.get('registros')
     if not isinstance(registros, list):
-        if test_mode:
-            return None, redirect(url_for('home'))
         registros = []
 
-    # 3. For test mode, an empty list triggers redirect
-    if len(registros) == 0 and test_mode:
-        return None, redirect(url_for('home'))
-
-    # 4. Normalize each registro
     normalized_registros = []
-    required_fields = {"TIPO_REGISTRO", "FECHA", "CANTIDAD", "PRIORIDAD", "ESTADO"}
-
     for registro in registros:
-        # Skip non-dict entries in tolerant mode; in test mode redirect
         if not isinstance(registro, dict):
-            if test_mode:
-                return None, redirect(url_for('home'))
-            continue
+            continue  # skip invalid entries
 
-        # In test mode, every registro must have all required fields
-        if test_mode and not required_fields.issubset(registro.keys()):
-            return None, redirect(url_for('home'))
-
-        # Build normalized entry (defaults applied)
         normalized_registros.append({
             "TIPO_REGISTRO": registro.get("TIPO_REGISTRO") or "solicitud",
             "FECHA": registro.get("FECHA") or "fecha no disponible",
@@ -112,10 +87,54 @@ def _normalize_user_data(user_data, test_mode):
             "ESTADO": registro.get("ESTADO") or "",
         })
 
-    # Build final normalized user_data
+    normalized_user = dict(user_data)
+    normalized_user["registros"] = normalized_registros
+    return normalized_user
+
+
+def _normalize_for_test(user_data):
+    """
+    Strict normalization for test mode.
+    Returns (normalized_data, None) on success, or (None, redirect) on failure.
+    """
+    if not isinstance(user_data, dict):
+        return None, redirect(url_for('home'))
+
+    registros = user_data.get('registros')
+    if not isinstance(registros, list):
+        return None, redirect(url_for('home'))
+
+    if len(registros) == 0:
+        return None, redirect(url_for('home'))
+
+    required_fields = {"TIPO_REGISTRO", "FECHA", "CANTIDAD", "PRIORIDAD", "ESTADO"}
+    normalized_registros = []
+
+    for registro in registros:
+        if not isinstance(registro, dict):
+            return None, redirect(url_for('home'))
+        if not required_fields.issubset(registro.keys()):
+            return None, redirect(url_for('home'))
+
+        normalized_registros.append({
+            "TIPO_REGISTRO": registro.get("TIPO_REGISTRO") or "solicitud",
+            "FECHA": registro.get("FECHA") or "fecha no disponible",
+            "CANTIDAD": registro.get("CANTIDAD") if registro.get("CANTIDAD") is not None else 0,
+            "PRIORIDAD": registro.get("PRIORIDAD") or "",
+            "ESTADO": registro.get("ESTADO") or "",
+        })
+
     normalized_user = dict(user_data)
     normalized_user["registros"] = normalized_registros
     return normalized_user, None
+
+
+def _normalize_user_data(user_data, test_mode):
+    """Dispatcher: chooses strict or tolerant normalization."""
+    if test_mode:
+        return _normalize_for_test(user_data)
+    else:
+        return _normalize_tolerant(user_data), None
 
 #////////////////////////////// Rutas //////////////////////////////////////////////
 
