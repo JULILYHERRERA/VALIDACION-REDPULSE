@@ -11,6 +11,8 @@ pipeline {
         CONTAINER_NAME = 'redpulse-app-container'
         SONAR_PROJECT_KEY = 'Redpulse'
         SONAR_PROJECT_NAME = 'Redpulse'
+        // Nombre del archivo de datos de cobertura para combinar
+        COV_DATA_FILE = '.coverage'
     }
 
     stages {
@@ -20,25 +22,80 @@ pipeline {
             }
         }
 
-        stage('Run Tests with Coverage') {
+        // Preparar el contenedor una sola vez (instalar dependencias, etc.)
+        stage('Prepare Test Container') {
             steps {
                 sh '''
-                docker rm -f redpulse-ci || true
+                    docker rm -f redpulse-ci || true
+                    docker run -d --name redpulse-ci python:3.11-slim tail -f /dev/null
+                    docker cp . redpulse-ci:/app
+                    docker exec redpulse-ci sh -lc "
+                        cd /app &&
+                        pip install --upgrade pip &&
+                        pip install -r requirements.txt
+                    "
+                '''
+            }
+        }
 
-                docker run -d --name redpulse-ci python:3.11-slim tail -f /dev/null
+        // 1. Pruebas de API
+        stage('API Tests') {
+            steps {
+                sh '''
+                    docker exec redpulse-ci sh -lc "
+                        cd /app &&
+                        pytest tests/api --cov=. --cov-append --cov-report= --cov-branch
+                    "
+                '''
+            }
+        }
 
-                docker cp . redpulse-ci:/app
+        // 2. Pruebas de Rendimiento (Performance)
+        stage('Performance Tests') {
+            steps {
+                sh '''
+                    docker exec redpulse-ci sh -lc "
+                        cd /app &&
+                        pytest tests/performance --cov=. --cov-append --cov-report= --cov-branch
+                    "
+                '''
+            }
+        }
 
-                docker exec redpulse-ci sh -lc "
-                    cd /app &&
-                    pip install --upgrade pip &&
-                    pip install -r requirements.txt &&
-                    pytest --cov --cov-report=xml --cov-report=term-missing
-                "
+        // 3. Pruebas de Regresión
+        stage('Regression Tests') {
+            steps {
+                sh '''
+                    docker exec redpulse-ci sh -lc "
+                        cd /app &&
+                        pytest tests/regression --cov=. --cov-append --cov-report= --cov-branch
+                    "
+                '''
+            }
+        }
 
-                docker cp redpulse-ci:/app/coverage.xml coverage.xml
+        // 4. Pruebas de Seguridad
+        stage('Security Tests') {
+            steps {
+                sh '''
+                    docker exec redpulse-ci sh -lc "
+                        cd /app &&
+                        pytest tests/security --cov=. --cov-append --cov-report= --cov-branch
+                    "
+                '''
+            }
+        }
 
-                docker rm -f redpulse-ci
+        // Generar reporte de cobertura final
+        stage('Generate Coverage Report') {
+            steps {
+                sh '''
+                    docker exec redpulse-ci sh -lc "
+                        cd /app &&
+                        coverage xml -o coverage.xml
+                    "
+                    docker cp redpulse-ci:/app/coverage.xml coverage.xml
+                    docker rm -f redpulse-ci
                 '''
             }
         }
@@ -84,6 +141,7 @@ pipeline {
 
     post {
         always {
+            // El coverage.xml ya se generó y archivó en el stage correspondiente
             archiveArtifacts artifacts: 'coverage.xml', fingerprint: true
         }
     }
