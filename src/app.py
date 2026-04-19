@@ -1,7 +1,6 @@
 #////////////////////////////// Importaciones //////////////////////////////////////////////
 import json
 import secrets
-import email 
 import secret_config
 
 from flask import Flask, render_template, request, redirect, url_for, session, jsonify
