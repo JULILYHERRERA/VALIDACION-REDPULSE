@@ -1,7 +1,6 @@
 import pytest
 import sys
 import os
-from assertpy import assert_that
 
 PROJECT_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), "../../.."))
 sys.path.append(os.path.join(PROJECT_ROOT, "src"))
@@ -10,20 +9,15 @@ from app import app
 
 def test_get_renderiza_vista(client):
     """Prueba GET: renderiza página. Uso de Dummy."""
-    # Arrange
-    dummy = None
-
     # Act
     resp = client.get("/solicitar_recuperacion")
 
-    # Assert (Fluent)
-    assert_that(resp.status_code).is_equal_to(200)
-    assert_that(dummy).is_none()
+    # Assert
+    assert resp.status_code == 200
 
 def test_redirige_si_ya_hay_sesion(client):
     """Prueba: si hay sesión activa, redirige a home."""
     # Arrange
-    dummy = {}
     with client.session_transaction() as sess:
         sess["user_data"] = {"nombre": "test"}
 
@@ -31,23 +25,20 @@ def test_redirige_si_ya_hay_sesion(client):
     resp = client.get("/solicitar_recuperacion", follow_redirects=False)
 
     # Assert
-    assert_that(resp.status_code).is_in(301, 302)
-    assert_that(dummy).is_not_none()
+    assert resp.status_code in (301, 302)
 
 def test_post_correo_no_registrado(client, monkeypatch):
     """POST con correo no registrado. Stub + Dummy."""
     # Arrange
     monkeypatch.setattr("app.verificarCorreo", lambda email: False)
-    dummy = "placeholder"
 
     # Act
     resp = client.post("/solicitar_recuperacion", data={"correo": "no@existe.com"})
 
     # Assert
-    assert_that(resp.status_code).is_equal_to(200)
+    assert resp.status_code == 200
     with client.session_transaction() as sess:
-        assert_that(sess["correo_valido_resultado"]).is_false()
-    assert_that(dummy).is_not_none()
+        assert sess["correo_valido_resultado"] is False
 
 def test_post_correo_registrado_envia_codigo(client, monkeypatch):
     """POST con correo registrado. Stubs + Spy."""
@@ -71,13 +62,13 @@ def test_post_correo_registrado_envia_codigo(client, monkeypatch):
     resp = client.post("/solicitar_recuperacion", data={"correo": correo})
 
     # Assert
-    assert_that(resp.status_code).is_equal_to(200)
+    assert resp.status_code == 200
     with client.session_transaction() as sess:
-        assert_that(sess["correo_valido_resultado"]).is_true()
-        assert_that(sess["correo_recuperacion"]).is_equal_to("ABC123")
-        assert_that(sess["correo_recuperacion_asociado"]).is_equal_to(correo)
-    assert_that(llamadas["count"]).is_equal_to(1)
-    assert_that(llamadas["args"]).is_equal_to((correo, "ABC123"))
+        assert sess["correo_valido_resultado"] is True
+        assert sess["correo_recuperacion"] == "ABC123"
+        assert sess["correo_recuperacion_asociado"] == correo
+    assert llamadas["count"] == 1
+    assert llamadas["args"] == (correo, "ABC123")
 
 def test_post_correo_registrado_error_email(client, monkeypatch):
     """POST con correo registrado pero fallo al enviar email."""

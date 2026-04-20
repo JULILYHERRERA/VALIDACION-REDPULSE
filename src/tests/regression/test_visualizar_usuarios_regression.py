@@ -2,7 +2,6 @@ import pytest
 import sys
 import os
 from unittest.mock import MagicMock
-from assertpy import assert_that
 
 PROJECT_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), "../../.."))
 sys.path.append(os.path.join(PROJECT_ROOT, "src"))
@@ -17,14 +16,12 @@ def test_visualizar_usuarios_get_happy_path(client, monkeypatch):
                   tipo_de_sangre="A+", donante=False, enfermero=True, puntos=5, total_donado=250)
     ]
     monkeypatch.setattr("app.obtenerTodosUsuariosNoAdmin", lambda: usuarios_mock)
-    dummy = []
     with client.session_transaction() as sess:
         sess["user_data"] = {"admin": True}
     response = client.get("/visualizar_usuarios")
-    assert_that(response.status_code).is_equal_to(200)
-    assert_that(response.data).contains(b"User1")
-    assert_that(response.data).contains(b"User2")
-    assert_that(dummy).is_not_none()
+    assert response.status_code == 200
+    assert b"User1" in response.data
+    assert b"User2" in response.data
 
 def test_visualizar_usuarios_post_eliminar_no_admin(client, monkeypatch):
     usuario_mock = MagicMock(admin=False, nombre="Test User")
@@ -39,12 +36,12 @@ def test_visualizar_usuarios_post_eliminar_no_admin(client, monkeypatch):
         "numero_documento": "123",
         "tipo_documento": "Cedula"
     }, follow_redirects=False)
-    assert_that(response.status_code).is_equal_to(302)
+    assert response.status_code == 302
     with client.session_transaction() as sess:
-        assert_that(sess.get("admin_usuarios_status")).is_equal_to("success")
-        assert_that(sess["admin_usuarios_user"]["nombre"]).is_equal_to("Test User")
-    assert_that(len(call_args)).is_equal_to(1)
-    assert_that(call_args[0]).is_equal_to(("123", "Cedula"))
+        assert sess.get("admin_usuarios_status") == "success"
+        assert sess["admin_usuarios_user"]["nombre"] == "Test User"
+    assert len(call_args) == 1
+    assert call_args[0] == ("123", "Cedula")
 
 def test_visualizar_usuarios_post_eliminar_admin(client, monkeypatch):
     usuario_mock = MagicMock(admin=True)
@@ -55,9 +52,9 @@ def test_visualizar_usuarios_post_eliminar_admin(client, monkeypatch):
         "numero_documento": "999",
         "tipo_documento": "Cedula"
     }, follow_redirects=False)
-    assert_that(response.status_code).is_equal_to(302)
+    assert response.status_code == 302
     with client.session_transaction() as sess:
-        assert_that(sess.get("admin_usuarios_status")).is_equal_to("cannot_delete_admin")
+        assert sess.get("admin_usuarios_status") == "cannot_delete_admin"
 
 def test_visualizar_usuarios_post_error_al_eliminar(client, monkeypatch):
     class MockUser:
@@ -75,18 +72,16 @@ def test_visualizar_usuarios_post_error_al_eliminar(client, monkeypatch):
         "numero_documento": "123",
         "tipo_documento": "Cedula"
     }, follow_redirects=False)
-    assert_that(response.status_code).is_equal_to(302)
-    assert_that(response.headers["Location"]).contains("/visualizar_usuarios")
+    assert response.status_code == 302
+    assert "/visualizar_usuarios" in response.headers["Location"]
     with client.session_transaction() as sess:
-        assert_that(sess.get("admin_usuarios_status")).is_equal_to("error")
-    assert_that(len(call_args)).is_equal_to(1)
-    assert_that(call_args[0]).is_equal_to(("123", "Cedula"))
+        assert sess.get("admin_usuarios_status") == "error"
+    assert len(call_args) == 1
+    assert call_args[0] == ("123", "Cedula")
 
 def test_visualizar_usuarios_no_admin(client):
-    dummy = 0
     with client.session_transaction() as sess:
         sess["user_data"] = {"admin": False}
     response = client.get("/visualizar_usuarios", follow_redirects=False)
-    assert_that(response.status_code).is_equal_to(302)
-    assert_that(response.headers["Location"]).is_equal_to("/")
-    assert_that(dummy).is_equal_to(0)
+    assert response.status_code == 302
+    assert response.headers["Location"] == "/"

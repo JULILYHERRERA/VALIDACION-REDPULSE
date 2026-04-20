@@ -2,21 +2,20 @@ import pytest
 import sys
 import os
 from types import SimpleNamespace
-from assertpy import assert_that
 
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "../../..")))
 
 def test_convertir_enfermero_requiere_autenticacion_y_admin(client):
     response = client.get("/convertir_enfermero", follow_redirects=False)
-    assert_that(response.status_code).is_equal_to(302)
-    assert_that(response.headers["Location"]).is_equal_to("/")
+    assert response.status_code == 302
+    assert response.headers["Location"] == "/"
 
 def test_convertir_enfermero_usuario_normal_no_accede(client):
     with client.session_transaction() as sess:
         sess["user_data"] = {"admin": False, "nombre": "normal"}
     response = client.get("/convertir_enfermero", follow_redirects=False)
-    assert_that(response.status_code).is_equal_to(302)
-    assert_that(response.headers["Location"]).is_equal_to("/")
+    assert response.status_code == 302
+    assert response.headers["Location"] == "/"
 
 def test_convertir_enfermero_post_sin_csrf_es_rechazado(client, monkeypatch):
     # Mock con objeto que tenga todos los atributos necesarios
@@ -35,7 +34,7 @@ def test_convertir_enfermero_post_sin_csrf_es_rechazado(client, monkeypatch):
     response = client.post("/convertir_enfermero", data=data, follow_redirects=False)
     # Como no hay protección CSRF activa, la vista procesa y redirige (302)
     # o puede dar 500 si algo falla. Aceptamos 302 como comportamiento actual.
-    assert_that(response.status_code).is_in(302, 500)
+    assert response.status_code in (302, 500)
 
 def test_convertir_enfermero_inyeccion_en_cedula(client, monkeypatch):
     call_args = []
@@ -59,6 +58,6 @@ def test_convertir_enfermero_inyeccion_en_cedula(client, monkeypatch):
         "cedula": payload,
         "tipo_documento": "Cedula"
     }, follow_redirects=False)
-    assert_that(len(call_args)).is_equal_to(1)
-    assert_that(call_args[0][0]).is_equal_to(payload)
-    assert_that(response.status_code).is_in(302, 500)
+    assert len(call_args) == 1
+    assert call_args[0][0] == payload
+    assert response.status_code in (302, 500)

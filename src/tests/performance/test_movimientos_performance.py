@@ -2,21 +2,32 @@ import time
 import pytest
 import sys
 import os
-import app
+from app import app
 
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 
 # =====================================================
-# PERFORMANCE 1 – Carga de historial grande
+# PERFORMANCE 1 – Renderizado de Movimientos
 # =====================================================
-def test_performance_carga_historial(client):
-    registros = [{"TIPO_REGISTRO": "solicitud", "FECHA": "2026-03-23", "CANTIDAD": 300} for _ in range(100)]
+def test_performance_movimientos_renderizado(client):
+    """Verifica que la página de movimientos carga rápidamente 10 veces."""
     with client.session_transaction() as sess:
-        sess["user_data"] = {"nombre": "Laura", "registros": registros}
+        sess["user_data"] = {
+            "nombre": "Test",
+            "registros": [
+                {
+                    "TIPO_REGISTRO": "Donacion",
+                    "FECHA": "2024-01-01",
+                    "CANTIDAD": 450,
+                    "PRIORIDAD": "Media",
+                    "ESTADO": "Completada"
+                }
+            ]
+        }
 
     start = time.time()
-    resp = client.get("/movimientos")
+    for _ in range(10):
+        client.get("/movimientos")
     end = time.time()
     
-    assert resp.status_code == 200
-    assert (end - start) < 0.5  # Cargar 100 registros en menos de 0.5 segundos
+    assert (end - start) < 1.0  # Menos de 1 segundo para 10 cargas

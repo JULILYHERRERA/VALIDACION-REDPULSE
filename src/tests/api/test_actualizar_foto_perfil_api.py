@@ -2,7 +2,6 @@ import pytest
 import io
 import sys
 import os
-from assertpy import assert_that
 
 PROJECT_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), "../../.."))
 sys.path.append(os.path.join(PROJECT_ROOT, "src"))
@@ -36,32 +35,34 @@ def test_api_actualizar_foto_perfil_exitoso(client, monkeypatch):
     response = client.post("/actualizar_foto_perfil", data=data, content_type="multipart/form-data")
 
     # Assert (API)
-    assert_that(response.status_code).is_equal_to(200)
-    assert_that(response.content_type).contains("application/json")
+    assert response.status_code == 200
+    assert "application/json" in response.content_type
     json_data = response.get_json()
-    assert_that(json_data).contains_key("success", "new_image_url")
-    assert_that(json_data["success"]).is_true()
-    assert_that(json_data["new_image_url"]).is_equal_to(mock_nuevo_link)
+    assert "success" in json_data
+    assert "new_image_url" in json_data
+    assert json_data["success"] is True
+    assert json_data["new_image_url"] == mock_nuevo_link
 
 def test_api_actualizar_foto_perfil_no_autorizado(client):
     """Verifica respuesta JSON para usuario sin sesión."""
     data = {"foto": (io.BytesIO(b"data"), "test.jpg")}
     response = client.post("/actualizar_foto_perfil", data=data, content_type="multipart/form-data")
-    assert_that(response.status_code).is_equal_to(401)
+    assert response.status_code == 401
     json_data = response.get_json()
-    assert_that(json_data).contains_key("success", "error")
-    assert_that(json_data["success"]).is_false()
-    assert_that(json_data["error"]).is_equal_to("No autorizado")
+    assert "success" in json_data
+    assert "error" in json_data
+    assert json_data["success"] is False
+    assert json_data["error"] == "No autorizado"
 
 def test_api_actualizar_foto_perfil_sin_archivo(client):
     """Verifica respuesta JSON cuando falta el archivo."""
     with client.session_transaction() as sess:
         sess["user_data"] = {"numero_documento": "123"}
     response = client.post("/actualizar_foto_perfil", data={})
-    assert_that(response.status_code).is_equal_to(400)
+    assert response.status_code == 400
     json_data = response.get_json()
-    assert_that(json_data["success"]).is_false()
-    assert_that(json_data["error"]).is_equal_to("No se envió ninguna imagen")
+    assert json_data["success"] is False
+    assert json_data["error"] == "No se envió ninguna imagen"
 
 def test_api_actualizar_foto_perfil_archivo_vacio(client):
     """Verifica respuesta JSON cuando el nombre del archivo está vacío."""
@@ -69,9 +70,9 @@ def test_api_actualizar_foto_perfil_archivo_vacio(client):
         sess["user_data"] = {"numero_documento": "123"}
     data = {"foto": (io.BytesIO(b"data"), "")}
     response = client.post("/actualizar_foto_perfil", data=data, content_type="multipart/form-data")
-    assert_that(response.status_code).is_equal_to(400)
+    assert response.status_code == 400
     json_data = response.get_json()
-    assert_that(json_data["error"]).is_equal_to("Archivo vacío")
+    assert json_data["error"] == "Archivo vacío"
 
 def test_api_actualizar_foto_perfil_error_imgur(client, monkeypatch):
     """Verifica respuesta JSON cuando Imgur falla."""
@@ -87,7 +88,7 @@ def test_api_actualizar_foto_perfil_error_imgur(client, monkeypatch):
         sess["user_data"] = {"numero_documento": "123"}
     data = {"foto": (io.BytesIO(b"data"), "test.jpg")}
     response = client.post("/actualizar_foto_perfil", data=data, content_type="multipart/form-data")
-    assert_that(response.status_code).is_equal_to(500)
+    assert response.status_code == 500
     json_data = response.get_json()
-    assert_that(json_data["success"]).is_false()
-    assert_that(json_data["error"]).is_equal_to("Error al subir la imagen a Imgur")
+    assert json_data["success"] is False
+    assert json_data["error"] == "Error al subir la imagen a Imgur"

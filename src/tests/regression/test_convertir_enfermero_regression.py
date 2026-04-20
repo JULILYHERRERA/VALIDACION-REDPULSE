@@ -2,7 +2,6 @@ import pytest
 import sys
 import os
 from unittest.mock import MagicMock
-from assertpy import assert_that
 
 PROJECT_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), "../../.."))
 sys.path.append(os.path.join(PROJECT_ROOT, "src"))
@@ -31,21 +30,20 @@ def test_convertir_enfermero_happy_path(client, monkeypatch):
     }, follow_redirects=False)
 
     # Assert
-    assert_that(response.status_code).is_equal_to(302)
-    assert_that(response.headers["Location"]).contains("/convertir_enfermero")
+    assert response.status_code == 302
+    assert "/convertir_enfermero" in response.headers["Location"]
 
     with client.session_transaction() as sess:
-        assert_that(sess["admin_conversion_status"]).is_equal_to("success")
-        assert_that(sess["admin_conversion_user"]["nombre"]).is_equal_to("Juan Perez")
+        assert sess["admin_conversion_status"] == "success"
+        assert sess["admin_conversion_user"]["nombre"] == "Juan Perez"
 
-    assert_that(call_args).is_length(1)
-    assert_that(call_args[0]).is_equal_to(("123", "Cedula de Ciudadania", True))
+    assert len(call_args) == 1
+    assert call_args[0] == ("123", "Cedula de Ciudadania", True)
 
 def test_convertir_enfermero_usuario_no_existe(client, monkeypatch):
     """Prueba unhappy: usuario no existe. Stub y Dummy."""
     # Arrange
     monkeypatch.setattr("app.verificarExistenciaUsuario", lambda ced, tip: False)
-    dummy = "no usado"
 
     with client.session_transaction() as sess:
         sess["user_data"] = {"admin": True}
@@ -57,10 +55,9 @@ def test_convertir_enfermero_usuario_no_existe(client, monkeypatch):
     }, follow_redirects=False)
 
     # Assert
-    assert_that(response.status_code).is_equal_to(302)
+    assert response.status_code == 302
     with client.session_transaction() as sess:
-        assert_that(sess["admin_conversion_status"]).is_equal_to("not_found")
-    assert_that(dummy).is_not_none()
+        assert sess["admin_conversion_status"] == "not_found"
 
 def test_convertir_enfermero_ya_es_enfermero(client, monkeypatch):
     """Prueba unhappy: usuario ya es enfermero. Stub."""
@@ -79,14 +76,13 @@ def test_convertir_enfermero_ya_es_enfermero(client, monkeypatch):
     }, follow_redirects=False)
 
     # Assert
-    assert_that(response.status_code).is_equal_to(302)
+    assert response.status_code == 302
     with client.session_transaction() as sess:
-        assert_that(sess["admin_conversion_status"]).is_equal_to("already_nurse")
+        assert sess["admin_conversion_status"] == "already_nurse"
 
 def test_convertir_enfermero_get_con_estado(client):
     """Prueba GET: renderiza template y limpia sesión. Uso de Dummy."""
     # Arrange
-    dummy = None
     with client.session_transaction() as sess:
         sess["user_data"] = {"admin": True, "nombre": "Admin"}
         sess["admin_conversion_status"] = "success"
@@ -96,16 +92,14 @@ def test_convertir_enfermero_get_con_estado(client):
     response = client.get("/convertir_enfermero")
 
     # Assert
-    assert_that(response.status_code).is_equal_to(200)
+    assert response.status_code == 200
     with client.session_transaction() as sess:
-        assert_that(sess).does_not_contain_key("admin_conversion_status")
-        assert_that(sess).does_not_contain_key("admin_conversion_user")
-    assert_that(dummy).is_none()
+        assert "admin_conversion_status" not in sess
+        assert "admin_conversion_user" not in sess
 
 def test_convertir_enfermero_no_admin(client):
     """Prueba unhappy: usuario no administrador -> redirige a home. Dummy."""
     # Arrange
-    dummy = {}
     with client.session_transaction() as sess:
         sess["user_data"] = {"admin": False, "nombre": "Usuario"}
 
@@ -113,6 +107,5 @@ def test_convertir_enfermero_no_admin(client):
     response = client.get("/convertir_enfermero", follow_redirects=False)
 
     # Assert
-    assert_that(response.status_code).is_equal_to(302)
-    assert_that(response.headers["Location"]).is_equal_to("/")
-    assert_that(dummy).is_not_none()
+    assert response.status_code == 302
+    assert response.headers["Location"] == "/"

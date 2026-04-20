@@ -7,7 +7,6 @@ import pytest
 import io
 import sys
 import os
-from assertpy import assert_that
 
 PROJECT_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), "../../.."))
 sys.path.append(os.path.join(PROJECT_ROOT, "src"))
@@ -30,12 +29,16 @@ def performance_client(client, monkeypatch):
         }
     return client
 
-def test_actualizar_foto_perfil_rendimiento_single(performance_client, benchmark):
+import time
+
+def test_actualizar_foto_perfil_rendimiento_single(performance_client):
     """Mide el tiempo de una sola petición exitosa."""
-    def hacer_peticion():
-        data = {"foto": (io.BytesIO(b"fake image data"), "test.jpg")}
-        return performance_client.post("/actualizar_foto_perfil", data=data, content_type="multipart/form-data")
-    response = benchmark(hacer_peticion)
-    assert_that(response.status_code).is_equal_to(200)
+    data = {"foto": (io.BytesIO(b"fake image data"), "test.jpg")}
+    start = time.time()
+    response = performance_client.post("/actualizar_foto_perfil", data=data, content_type="multipart/form-data")
+    end = time.time()
+    assert response.status_code == 200
+    assert (end - start) < 0.5  # Una sola petición debe ser rápida
+
 
 # La prueba concurrente se elimina porque no es trivial con Flask test_client.
