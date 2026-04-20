@@ -557,6 +557,10 @@ def agregar_donacion():
     if not user_data or not user_data.get('enfermero'): #verifico el rol de enfermero , asi protegemos la ruta
         return redirect(url_for('home'))
 
+    # Verificar que haya un usuario objetivo verificado
+    if not user_obtained_data or 'cedula_usuario' not in user_obtained_data:
+        return redirect(url_for('enfermero'))
+
     session['enfermero_usuario_verificacion'] = None #reincia estados
 
     if request.method == 'POST':
@@ -574,9 +578,6 @@ def agregar_donacion():
         except (ValueError, TypeError):
             session['mensaje_validacion_donacion'] = "La cantidad debe ser un número válido."
             return render_template('agregar_donacion.html')
-
-        if not user_obtained_data or 'cedula_usuario' not in user_obtained_data:
-            return redirect(url_for('enfermero'))
 
         numero_documento = user_obtained_data['cedula_usuario']
         tipo_documento = user_obtained_data['tipo_cedula_usuario']
