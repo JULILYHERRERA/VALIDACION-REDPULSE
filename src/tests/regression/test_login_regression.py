@@ -40,7 +40,7 @@ def test_regression_login_flujo_completo_donante(client, monkeypatch):
         total_donado = 500
         tipo_de_sangre = "O+"
         tipo_documento = "Cedula de Ciudadania"
-        perfil_imagen_link = "http://link.com"
+        perfil_imagen_link = "https://link.com"
         perfil_imagen_deletehash = "hash123"
 
     monkeypatch.setattr(modulo, "verificacionLogin", lambda doc, tipo, contra: True)
