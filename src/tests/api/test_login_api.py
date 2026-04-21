@@ -11,13 +11,13 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 def test_api_login_get(client):
     """Verifica que la página de login carga correctamente."""
     resp = client.get("/login")
-    assert resp.status_code == 200
-    assert b"login" in resp.data.lower()
+    assert resp.status_code == 200 #verifica que la respuesta sea esa, si no devuelve 200 el assert falla
+    assert b"login" in resp.data.lower() 
 
 # =====================================================
 # API 2 – POST Login exitoso
 # =====================================================
-def test_api_login_post_exitoso(client, monkeypatch):
+def test_api_login_post_exitoso(client, monkeypatch): 
     """Verifica que un login con credenciales válidas crea la sesión."""
     import app as modulo
 
@@ -36,6 +36,7 @@ def test_api_login_post_exitoso(client, monkeypatch):
         perfil_imagen_link = None
         perfil_imagen_deletehash = None
 
+    #para simular fun reales
     monkeypatch.setattr(modulo, "verificacionLogin", lambda doc, tipo, contra: True)
     monkeypatch.setattr(modulo, "obtenerUsuarioPorDocumento", lambda doc, tipo: UsuarioFake())
     monkeypatch.setattr(modulo, "generarUsuarioSesion", lambda *args: {"nombre": "Juan", "doc": "123456"})
