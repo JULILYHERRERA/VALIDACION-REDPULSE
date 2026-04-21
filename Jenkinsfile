@@ -38,7 +38,7 @@ pipeline {
             }
         }
 
-        // 1. Pruebas de API
+        // Pruebas de API
         stage('API Tests') {
             steps {
                 sh '''
@@ -50,7 +50,7 @@ pipeline {
             }
         }
 
-        // 2. Pruebas de Rendimiento (Performance)
+        // Pruebas de Rendimiento (Performance)
         stage('Performance Tests') {
             steps {
                 sh '''
@@ -62,7 +62,7 @@ pipeline {
             }
         }
 
-        // 3. Pruebas de Regresión
+        // Pruebas de Regresión
         stage('Regression Tests') {
             steps {
                 sh '''
@@ -74,7 +74,7 @@ pipeline {
             }
         }
 
-        // 4. Pruebas de Seguridad
+        // Pruebas de Seguridad
         stage('Security Tests') {
             steps {
                 sh '''
