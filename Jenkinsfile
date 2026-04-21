@@ -44,7 +44,7 @@ pipeline {
                 sh '''
                     docker exec redpulse-ci sh -lc "
                         cd /app &&
-                        pytest tests/api --cov=. --cov-append --cov-report= --cov-branch
+                        pytest src/tests/api --cov=. --cov-append --cov-report= --cov-branch
                     "
                 '''
             }
@@ -56,7 +56,7 @@ pipeline {
                 sh '''
                     docker exec redpulse-ci sh -lc "
                         cd /app &&
-                        pytest tests/performance --cov=. --cov-append --cov-report= --cov-branch
+                        pytest src/tests/performance --cov=. --cov-append --cov-report= --cov-branch
                     "
                 '''
             }
@@ -68,7 +68,7 @@ pipeline {
                 sh '''
                     docker exec redpulse-ci sh -lc "
                         cd /app &&
-                        pytest tests/regression --cov=. --cov-append --cov-report= --cov-branch
+                        pytest src/tests/regression --cov=. --cov-append --cov-report= --cov-branch
                     "
                 '''
             }
@@ -80,7 +80,7 @@ pipeline {
                 sh '''
                     docker exec redpulse-ci sh -lc "
                         cd /app &&
-                        pytest tests/security --cov=. --cov-append --cov-report= --cov-branch
+                        pytest src/tests/security --cov=. --cov-append --cov-report= --cov-branch
                     "
                 '''
             }
