@@ -40,8 +40,11 @@
                 </div>
                 {% endif %}
 
-                <form method="post">
-                    <meta name="csrf-token" content="{{ csrf_token() }}">
+                <form method="POST">
+                    
+                    <!-- ✅ CSRF CORRECTO -->
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
                     <label for="quantity">Cantidad (ml):</label>
                     <input type="number" id="quantity" name="cantidad_sangre_donada" min="100" max="500" required>
 
@@ -68,7 +71,6 @@
                 </form>
 
             </section>
-
         </main>
     </div>
 
@@ -96,7 +98,6 @@
         function submitForm() {
             document.getElementById('success-message').style.display = 'none';
         }
-
     </script> 
 </body>
 </html>
