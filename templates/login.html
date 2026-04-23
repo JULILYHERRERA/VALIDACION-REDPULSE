@@ -20,7 +20,7 @@
 
             <h2>¡Hola de nuevo!</h2>
             <form id="loginForm" method="POST">
-                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                <meta name="csrf-token" content="{{ csrf_token() }}">
                 <input type="text" name="numero_documento" placeholder="Número de Documento" required>
                 <select name="tipo_documento" required>
                     <option value="">Seleccione Tipo de Documento</option>
