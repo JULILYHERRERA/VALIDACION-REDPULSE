@@ -26,7 +26,7 @@
                 <h2>Filtrar solicitudes por tipo de sangre</h2>
 
                 <form method="POST">
-                    <meta name="csrf-token" content="{{ csrf_token() }}">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                     <label for="tipo_sangre">Seleccione un tipo de sangre:</label>
                     <select name="tipo_sangre" id="tipo_sangre" required>
                         <option value="">Seleccione</option>

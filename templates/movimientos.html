@@ -29,7 +29,7 @@
             
             <h2>Movimientos</h2>
 
-            {% if user_data['registros'] %}
+            {% if user_data.get('registros') %}
                 {% for registro in user_data['registros'] %}
                 <div class="historical">
                     <h3>Movimiento {{ loop.index }}</h3>

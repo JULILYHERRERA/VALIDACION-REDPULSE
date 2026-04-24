@@ -52,7 +52,7 @@
                             <td>{{ user.total_donado }} ml</td>
                             <td>
                                 <form method="POST" action="{{ url_for('visualizar_usuarios') }}" onsubmit="return confirm('¿Está seguro de eliminar a {{ user.nombre }}? Esta acción no se puede deshacer.');">
-                                    <meta name="csrf-token" content="{{ csrf_token() }}">
+                                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                                     <input type="hidden" name="numero_documento" value="{{ user.numero_documento }}">
                                     <input type="hidden" name="tipo_documento" value="{{ user.tipo_documento }}">
                                     <button type="submit" class="delete-button">Eliminar</button>
