@@ -14,9 +14,9 @@ def test_api_actualizar_foto_perfil_exitoso(client, monkeypatch):
     mock_nuevo_link = "https://i.imgur.com/test.jpg"
     mock_nuevo_deletehash = "abc123"
 
-    def mock_generarUsuarioImagen(imagen, handler):
+    def mock_generar_usuario_imagen(imagen, handler):
         return mock_nuevo_link, mock_nuevo_deletehash
-    monkeypatch.setattr("app.generarUsuarioImagen", mock_generarUsuarioImagen)
+    monkeypatch.setattr("app.generarUsuarioImagen", mock_generar_usuario_imagen)
 
     def mock_actualizar_imagen(doc, tip, link, delete):
         pass  # Spy no necesario para API
@@ -78,9 +78,10 @@ def test_api_actualizar_foto_perfil_error_imgur(client, monkeypatch):
     """Verifica respuesta JSON cuando Imgur falla."""
     import secret_config
     # Retornar exactamente DEFAULT_PROFILE_PICTURE
-    def mock_generarUsuarioImagen(imagen, handler):
+    def mock_generar_usuario_imagen_error(imagen, handler):
         return secret_config.DEFAULT_PROFILE_PICTURE, None
-    monkeypatch.setattr("app.generarUsuarioImagen", mock_generarUsuarioImagen)
+    monkeypatch.setattr("app.generarUsuarioImagen", mock_generar_usuario_imagen_error)
+
     # También mockear actualizar_imagen_usuario para que no interfiera (aunque no debería llamarse)
     monkeypatch.setattr("app.actualizar_imagen_usuario", lambda doc, tip, link, delete: None)
     

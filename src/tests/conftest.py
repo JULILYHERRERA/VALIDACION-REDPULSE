@@ -80,8 +80,9 @@ def client():
                     datos = dict(kwargs["data"])
                     datos.setdefault("csrf_token", token)
                     kwargs["data"] = datos
-                if headers:
-                    kwargs["headers"] = headers
+                # headers ya se procesó al inicio del método
+                kwargs["headers"] = headers
+
             else:
                 # POST sin body: enviamos el token por cabecera para que
                 # la protección CSRF no bloquee el caso que se quiere probar.

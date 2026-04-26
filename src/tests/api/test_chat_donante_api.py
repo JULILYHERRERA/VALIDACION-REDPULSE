@@ -57,9 +57,10 @@ def test_api_chatbot_error_ia(client, monkeypatch):
         sess["user_data"] = {"nombre": "Ana", "donante": True}
 
     def fallo(*args, **kwargs):
-        raise Exception("IA caída")
+        raise RuntimeError("IA caída")
 
     monkeypatch.setattr(app, "generate_response", fallo)
+
 
     # ACT
     resp = client.post(

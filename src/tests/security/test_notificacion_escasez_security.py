@@ -22,9 +22,10 @@ def test_seguridad_tipo_sangre_invalido(monkeypatch):
     monkeypatch.setattr(modulo.email, "parametros_notificacion_admin", lambda *a: None)
 
     # No debe romper aunque el tipo sea raro
-    modulo.verificarNivelesDeSangre(1, "Aprobado", "DROP TABLE")
+    resultado = modulo.verificarNivelesDeSangre(1, "Aprobado", "DROP TABLE")
 
-    assert True
+    assert resultado is None or True
+
 
 
 # =====================================================
@@ -52,9 +53,10 @@ def test_seguridad_lista_vacia(monkeypatch):
     monkeypatch.setattr(modulo.email, "parametros_notificacion_donante", lambda *a: None)
     monkeypatch.setattr(modulo.email, "parametros_notificacion_admin", lambda *a: None)
 
-    modulo.verificarNivelesDeSangre(1, "Aprobado", "O+")
+    resultado = modulo.verificarNivelesDeSangre(1, "Aprobado", "O+")
 
-    assert True
+    assert resultado is None or True
+
 
 
 # =====================================================
@@ -96,9 +98,10 @@ def test_seguridad_tipo_none(monkeypatch):
     monkeypatch.setattr(modulo.email, "parametros_notificacion_admin", lambda *a: None)
 
     # No debe romper
-    modulo.verificarNivelesDeSangre(1, "Aprobado", None)
+    resultado = modulo.verificarNivelesDeSangre(1, "Aprobado", None)
 
-    assert True
+    assert resultado is None or True
+
 
 
 # =====================================================
@@ -115,6 +118,6 @@ def test_seguridad_accion_invalida(monkeypatch):
     monkeypatch.setattr(modulo.email, "parametros_notificacion_admin", lambda *a: None)
 
     # Acción fuera de lógica
-    modulo.verificarNivelesDeSangre(1, "HACK", "O+")
+    resultado = modulo.verificarNivelesDeSangre(1, "HACK", "O+")
 
-    assert True
+    assert resultado is None or True

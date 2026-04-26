@@ -49,9 +49,9 @@ def test_api_get_registro(client):
 
     # ===================== ARRANGE =====================
     # No sesión activa
-    pass
 
     # ======================= ACT =======================
+
     resp = client.get("/registro")
 
     # ====================== ASSERT =====================

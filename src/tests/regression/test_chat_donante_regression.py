@@ -130,9 +130,10 @@ def test_regresion_error_ia_controlado(client, monkeypatch):
         sess["user_data"] = {"nombre": "Ana", "donante": True}
 
     def fallo(*args, **kwargs):
-        raise Exception("IA caída")
+        raise RuntimeError("IA caída")
 
     monkeypatch.setattr(app, "generate_response", fallo)
+
 
     # ACT
     resp = client.post(

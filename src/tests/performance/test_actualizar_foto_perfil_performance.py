@@ -16,9 +16,10 @@ from app import app
 @pytest.fixture
 def performance_client(client, monkeypatch):
     """Configura el cliente con mocks para pruebas de rendimiento."""
-    def mock_generarUsuarioImagen(imagen, handler):
+    def mock_generar_usuario_imagen_bench(imagen, handler):
         return "https://i.imgur.com/bench.jpg", "bench_hash"
-    monkeypatch.setattr("app.generarUsuarioImagen", mock_generarUsuarioImagen)
+    monkeypatch.setattr("app.generarUsuarioImagen", mock_generar_usuario_imagen_bench)
+
     monkeypatch.setattr("app.actualizar_imagen_usuario", lambda doc, tip, link, delete: None)
     with client.session_transaction() as sess:
         sess["user_data"] = {
