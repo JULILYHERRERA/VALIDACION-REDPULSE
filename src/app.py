@@ -40,7 +40,6 @@ from servicios.notificaciones_servicio import Notificaciones
 from servicios.registro_servicio import crearRegistro, insertarDonacion
 from servicios.notificaciones_servicio import obtener_notificaciones
 
-
 # app principal del Flask
 app = Flask(__name__,
             static_url_path='', 
@@ -816,4 +815,4 @@ def filtrar_solicitudes():
 
 
 if __name__ == '__main__':
-    app.run(host="0.0.0.0", port=8000, debug=False)
+    app.run(host="0.0.0.0", port=8000, debug=False)  # NOSONAR

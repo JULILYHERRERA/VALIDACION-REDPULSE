@@ -60,35 +60,31 @@ def client():
     flask_app.config["SECRET_KEY"] = "test-secret"
 
     with flask_app.test_client() as c:
-        # 1. GET a ruta pública → Flask-WTF crea y guarda el token en sesión.
+        # GET a ruta pública → Flask-WTF crea y guarda el token en sesión.
         resp = c.get("/login")
         token = _extraer_csrf(resp.data)
 
-        # 2. Envolvemos client.post para inyectar el token automáticamente.
+        # Envolvemos client.post para inyectar el token automáticamente.
         _post_original = c.post
 
         def post_con_csrf(path, **kwargs):
             headers = dict(kwargs.pop("headers", None) or {})
 
             if "json" in kwargs:
-                # Petición JSON: token en cabecera X-CSRFToken
                 headers.setdefault("X-CSRFToken", token)
-                kwargs["headers"] = headers
+
             elif "data" in kwargs:
-                # Petición de formulario: token en campo oculto csrf_token
                 if isinstance(kwargs["data"], dict):
                     datos = dict(kwargs["data"])
                     datos.setdefault("csrf_token", token)
                     kwargs["data"] = datos
-                # headers ya se procesó al inicio del método
-                kwargs["headers"] = headers
 
             else:
-                # POST sin body: enviamos el token por cabecera para que
-                # la protección CSRF no bloquee el caso que se quiere probar.
                 headers.setdefault("X-CSRFToken", token)
-                kwargs["headers"] = headers
-            return _post_original(path, **kwargs)
+                
+            kwargs["headers"] = headers
 
+            return _post_original(path, **kwargs)
+        
         c.post = post_con_csrf
         yield c
