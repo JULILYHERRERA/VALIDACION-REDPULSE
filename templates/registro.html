@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>RedPulse - Registro</title>
     <link rel="stylesheet" href="/css/stylesRegistro.css">
-
 </head>
 <body>
 
@@ -19,18 +18,25 @@
           </header>
 
             <h2>Crear Cuenta</h2>
+
             <form id="registerForm" method="POST" enctype="multipart/form-data">
-                <meta name="csrf-token" content="{{ csrf_token() }}">
+                
+                <!-- ✅ CSRF TOKEN CORRECTO -->
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
                 <div class="name-lastname">
                     <input type="text" name="nombre" placeholder="Nombre" required>
                     <input type="text" name="apellido" placeholder="Apellido" required>
                 </div>
+
                 <select name="tipo_documento" required>
                     <option value="">Seleccione Tipo de Documento</option>
                     <option value="Cedula de Ciudadania">Cédula de Ciudadanía</option>
                     <option value="Cedula de Extranjeria">Cédula de Extranjería</option>
                 </select>
+
                 <input type="text" name="numero_documento" placeholder="Número de Documento" required>
+
                 <select id="blood-type" name="tipo_de_sangre" required>
                     <option value="">Seleccione su tipo de sangre</option>
                     <option value="A+">A+</option>
@@ -42,14 +48,18 @@
                     <option value="O+">O+</option>
                     <option value="O-">O-</option>
                 </select>
+
                 <input type="email" name="correo" placeholder="Correo Electrónico" required>
                 <input type="password" name="contrasena" placeholder="Contraseña" required>
                 <input type="password" name="confirmar_contrasena" placeholder="Confirmar Contraseña" required>
-                <!-- Nueva Sección de Imagen -->
-                <input type="file" name="perfil_imagen" accept=".jpg, .jpeg, .png" placeholder="foto de perfil (opcional)">
+
+                <!-- Imagen -->
+                <input type="file" name="perfil_imagen" accept=".jpg, .jpeg, .png">
+
                 <div class="register-terms">
                     <input type="checkbox" required> Acepto los <a href="#">Términos y Condiciones</a>
                 </div>
+
                 <button type="submit">Crear Cuenta</button>
             </form>
         </div>

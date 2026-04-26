@@ -16,7 +16,7 @@ NOTI_APPCONTRA = "qeip heka pcay mahv"
 SECRET_KEY_FLASK = "j98h3y2qweRTY8uiopASDFGHJKLZXCVBNM,./1234567890-=`~!@#$%^&*()_+[]{}|;:?><"
 
 # Key para la conexion con MetaAI # https://groq.com/groqcloud/
-CHAT_BOT_KEY = "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"
+CHAT_BOT_KEY = "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"
 
 # Correo por defecto del administrador
 ADMINEMAIL = "redpulsetst@gmail.com"
